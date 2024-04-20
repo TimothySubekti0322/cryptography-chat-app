@@ -60,6 +60,22 @@ const Index = () => {
               </Pressable>
             </View>
           </View>
+          <View className="items-center w-full mt-4">
+            <View
+              className="w-1/2 rounded-full border-2 border-[#40a5a9] bg-[#76d3d6] overflow-hidden"
+              style={{ elevation: 5 }}
+            >
+              <Pressable
+                android_ripple={{ color: "#40a5a9" }}
+                className="items-center py-3 rounded-full"
+                onPress={() => {
+                  router.push("/downloadFileTest");
+                }}
+              >
+                <Text>Download File Test</Text>
+              </Pressable>
+            </View>
+          </View>
         </View>
       </SafeAreaView>
     </>

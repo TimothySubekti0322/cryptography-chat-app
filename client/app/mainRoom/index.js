@@ -21,6 +21,9 @@ const Index = () => {
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
+
+  const [newContact, setNewContact] = useState("");
+  const [newContactError, setNewContactError] = useState(false);
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -40,7 +43,12 @@ const Index = () => {
             <Text className="mt-8" style={{ fontFamily: "Nunito_500Medium" }}>
               Insert Username
             </Text>
-            <TextInput className="border-[1px] border-[#BCA29A] rounded-full mt-2 py-2 px-4" />
+            <TextInput
+              className="border-[1px] border-[#BCA29A] rounded-full mt-2 py-2 px-4"
+              style={{ fontFamily: "Nunito_500Medium" }}
+              value={newContact}
+              onChangeText={(text) => setNewContact(text)}
+            />
             <View className="items-center justify-center w-full mt-8 ">
               <View className="w-1/2 bg-[#C4E0B4] border-[1px] border-[#95B584] rounded-full overflow-hidden">
                 <Pressable
