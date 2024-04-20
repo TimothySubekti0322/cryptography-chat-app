@@ -20,6 +20,8 @@ import {
   Nunito_900Black_Italic,
 } from "@expo-google-fonts/nunito";
 
+import CredentialContextProvider from "../store/context/credential-context";
+
 export default function Layout() {
   let [fontsLoaded, fontError] = useFonts({
     Nunito_200ExtraLight,
@@ -43,5 +45,9 @@ export default function Layout() {
   if (!fontsLoaded && !fontError) {
     return null;
   }
-  return <Stack />;
+  return (
+    <CredentialContextProvider>
+      <Stack />
+    </CredentialContextProvider>
+  );
 }

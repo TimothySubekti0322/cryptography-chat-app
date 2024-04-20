@@ -1,5 +1,5 @@
 import { Text } from "react-native-paper";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Pressable,
   TextInput,
@@ -7,11 +7,75 @@ import {
   Image,
   KeyboardAvoidingView,
 } from "react-native";
-import { Stack, Link } from "expo-router";
+import { Stack, Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { CredentialContext } from "../../store/context/credential-context";
+import { checkNumberPositivePrime } from "../../utils/function";
 
 const Index = () => {
+  const credentialCtx = useContext(CredentialContext);
+
+  const [primeNumber1, setPrimeNumber1] = useState("");
+  const [primeNumber2, setPrimeNumber2] = useState("");
+
+  const [primeNumber1Error, setPrimeNumber1Error] = useState(null);
+  const [primeNumber2Error, setPrimeNumber2Error] = useState(null);
+
+  const checkInput = () => {
+    if (!primeNumber1) {
+      setPrimeNumber1Error("Prime number 1 is required");
+      return false;
+    } else {
+      setPrimeNumber1Error(null);
+    }
+    if (!primeNumber2) {
+      setPrimeNumber2Error("Prime number 2 is required");
+      return false;
+    } else {
+      setPrimeNumber2Error(null);
+    }
+    if (primeNumber1 === primeNumber2) {
+      setPrimeNumber2Error(
+        "Prime number 2 must be different from prime number 1"
+      );
+      return false;
+    } else {
+      setPrimeNumber2Error(null);
+    }
+
+    const prime1 = parseInt(primeNumber1);
+    const checkPrime1 = checkNumberPositivePrime(prime1);
+    if (checkPrime1 !== "Number is prime") {
+      setPrimeNumber1Error(checkPrime1);
+      return false;
+    } else {
+      setPrimeNumber1Error(null);
+    }
+
+    const prime2 = parseInt(primeNumber2);
+    const checkPrime2 = checkNumberPositivePrime(prime2);
+    if (checkPrime2 !== "Number is prime") {
+      setPrimeNumber2Error(checkPrime2);
+      return false;
+    } else {
+      setPrimeNumber2Error(null);
+    }
+    return true;
+  };
+
+  const handleSignUp = () => {
+    // Handle login here
+    console.log("Username: ", credentialCtx.username);
+    console.log("Password: ", credentialCtx.password);
+    console.log("Prime 1: ", primeNumber1);
+    console.log("Prime 2: ", primeNumber2);
+
+    const isValid = checkInput();
+
+    if (isValid) router.replace("../login");
+  };
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -29,8 +93,28 @@ const Index = () => {
           </View>
           <View className="items-start w-full mt-12">
             <Text className="text-start">choose 2 random number</Text>
-            <TextInput className="rounded-full border-2 border-[#BCA29A] w-full h-12 px-4 mt-2" />
-            <TextInput className="rounded-full border-2 border-[#BCA29A] w-full h-12 px-4 mt-2" />
+            <TextInput
+              className={`${
+                primeNumber1Error ? "border-[#BC4B48]" : "border-[#BCA29A]"
+              } rounded-full border-2 w-full h-12 px-4 mt-2`}
+              value={primeNumber1}
+              keyboardType="number-pad"
+              onChangeText={(text) => setPrimeNumber1(text)}
+            />
+            {primeNumber1Error && (
+              <Text className="text-[#BC4B48] mt-1">{primeNumber1Error}</Text>
+            )}
+            <TextInput
+              className={`${
+                primeNumber2Error ? "border-[#BC4B48]" : "border-[#BCA29A]"
+              } rounded-full border-2 w-full h-12 px-4 mt-2`}
+              value={primeNumber2}
+              keyboardType="number-pad"
+              onChangeText={(text) => setPrimeNumber2(text)}
+            />
+            {primeNumber2Error && (
+              <Text className="text-[#BC4B48] mt-1">{primeNumber2Error}</Text>
+            )}
           </View>
           <View className="items-center w-full mt-8">
             <View
@@ -40,6 +124,7 @@ const Index = () => {
               <Pressable
                 android_ripple={{ color: "#e0be6f" }}
                 className="items-center py-3 rounded-full"
+                onPress={handleSignUp}
               >
                 <Text>sign up</Text>
               </Pressable>

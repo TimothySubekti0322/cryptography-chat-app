@@ -1,3 +1,4 @@
+import { useContext, useEffect, useState } from "react";
 import {
   Image,
   Pressable,
@@ -10,19 +11,61 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Stack, router } from "expo-router";
 
+import { CredentialContext } from "../../store/context/credential-context";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Contact from "../../components/contact";
+
 const contactList = [
-  "Nadira",
-  "Jodi",
-  "Carissa",
-  "Nadine",
-  "Nadine",
-  "Nadine",
-  "Nadine",
-  "Nadine",
-  "Nadine",
+  {
+    name: "Nadira",
+    lastMessage: "Nadira sent a file",
+  },
+  {
+    name: "Jodi",
+    lastMessage: "Jangan lupa Absen",
+  },
+  {
+    name: "Carissa",
+    lastMessage: "Gimana kabar kamu?",
+  },
+  {
+    name: "Nadine",
+    lastMessage: "Tim lo dimana ?",
+  },
+  {
+    name: "Marvel",
+    lastMessage: "Kapan kita main?",
+  },
+  {
+    name: "Lim",
+    lastMessage: "udh kerjain AE tim ?",
+  },
+  {
+    name: "Marcel",
+    lastMessage: "Tim udh kerjain assement paragon ?",
+  },
 ];
 
 const MainRoomComponent = ({ showModal }) => {
+  const credentialCtx = useContext(CredentialContext);
+
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const getUsername = async () => {
+      const username = await AsyncStorage.getItem("username");
+      setUsername(username);
+    };
+    getUsername();
+  }, []);
+
+  const signOutHandler = () => {
+    credentialCtx.setUsername("");
+    credentialCtx.setPassword("");
+
+    router.replace("/");
+  };
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -30,7 +73,7 @@ const MainRoomComponent = ({ showModal }) => {
       <SafeAreaView className="" style={{ flex: 1 }}>
         <View className="flex-row items-center w-full px-6 py-6 bg-[#C4E0B4]">
           <Image source={require("../../assets/header-avatar.png")} />
-          <Text className="ml-4 text-2xl font-bold">Timothy</Text>
+          <Text className="ml-4 text-2xl font-bold">{username}</Text>
         </View>
 
         {/* Contact List */}
@@ -41,21 +84,11 @@ const MainRoomComponent = ({ showModal }) => {
           <Text className="mb-4 text-2xl font-bold">Contacts</Text>
           <ScrollView className="h-[70%]" showsVerticalScrollIndicator={false}>
             {contactList.map((contact, index) => (
-              <View key={index} className="border-b-[1px] border-[#FCF6E0]">
-                <Pressable
-                  className="flex-row items-center w-full py-3"
-                  android_ripple={{ color: "#DAD4C0" }}
-                  onPress={() => router.push("../chatRoom")}
-                >
-                  <Image source={require("../../assets/contact-avatar.png")} />
-                  <View className="flex-col ml-4">
-                    <Text className="text-lg">{contact}</Text>
-                    <Text className="text-[#BCA29A]">
-                      {contact} sent a file
-                    </Text>
-                  </View>
-                </Pressable>
-              </View>
+              <Contact
+                key={index}
+                contact={contact.name}
+                lastMessage={contact.lastMessage}
+              />
             ))}
             <View className="">
               <Pressable
@@ -77,7 +110,7 @@ const MainRoomComponent = ({ showModal }) => {
             <Pressable
               className="flex-row items-center px-2 py-1"
               android_ripple={{ color: "#E5242B" }}
-              onPress={() => router.push("/")}
+              onPress={signOutHandler}
             >
               <Text>Log Out</Text>
               <Image

@@ -1,3 +1,4 @@
+import { useContext, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -9,8 +10,52 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, Stack, router } from "expo-router";
+import { CredentialContext } from "../../store/context/credential-context";
 
 const SignUp = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [usernameError, setUsernameError] = useState(null);
+  const [passwordError, setPasswordError] = useState(null);
+
+  const checkCredentials = () => {
+    if (!username) {
+      setUsernameError("Username is required");
+      return false;
+    } else {
+      setUsernameError(null);
+    }
+    if (!password) {
+      setPasswordError("Password is required");
+      return false;
+    } else {
+      setPasswordError(null);
+    }
+    return true;
+  };
+
+  const handleSignUp = () => {
+    // Handle login here
+    console.log("Username: ", username);
+    console.log("Password: ", password);
+
+    const isValid = checkCredentials();
+
+    if (isValid) {
+      // Handle login here
+      console.log("Username: ", username);
+      console.log("Password: ", password);
+
+      // Save username and password to Credential Context
+      const credentialCtx = useContext(CredentialContext);
+      credentialCtx.setUsername(username);
+      credentialCtx.setPassword(password);
+
+      // Navigate to keyGenerate screen
+      router.push("/signup/keyGenerate");
+    }
+  };
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -28,11 +73,30 @@ const SignUp = () => {
           </View>
           <View className="items-start w-full mt-12">
             <Text className="text-start">Username</Text>
-            <TextInput className="rounded-full border-2 border-[#BCA29A] w-full h-12 px-4 mt-2" />
+            <TextInput
+              className={`${
+                usernameError ? "border-[#BC4B48]" : "border-[#BCA29A]"
+              } rounded-full border-2 w-full h-12 px-4 mt-2`}
+              value={username}
+              onChangeText={(text) => setUsername(text)}
+            />
+            {usernameError && (
+              <Text className="text-[#BC4B48] mt-1">{usernameError}</Text>
+            )}
           </View>
           <View className="items-start w-full mt-4">
             <Text className="text-start">Password</Text>
-            <TextInput className="rounded-full border-2 border-[#BCA29A] w-full h-12 px-4 mt-2" />
+            <TextInput
+              className={`${
+                passwordError ? "border-[#BC4B48]" : "border-[#BCA29A]"
+              } rounded-full border-2 w-full h-12 px-4 mt-2`}
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+              secureTextEntry={true}
+            />
+            {passwordError && (
+              <Text className="text-[#BC4B48] mt-1">{passwordError}</Text>
+            )}
           </View>
           <View className="items-center w-full mt-8">
             <View
@@ -42,7 +106,7 @@ const SignUp = () => {
               <Pressable
                 android_ripple={{ color: "#e0be6f" }}
                 className="items-center py-3 rounded-full"
-                onPress={() => router.replace("../login")}
+                onPress={handleSignUp}
               >
                 <Text>sign up</Text>
               </Pressable>
