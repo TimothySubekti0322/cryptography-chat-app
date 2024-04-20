@@ -1,8 +1,7 @@
-import React, { useState } from "react";
 import { Modal, Portal, Text, PaperProvider } from "react-native-paper";
+import { useState } from "react";
 import { Pressable, TextInput, View } from "react-native";
 import { Stack } from "expo-router";
-import MainRoomComponent from "./MainRoomComponent";
 
 const containerStyle = {
   backgroundColor: "#FFF9E2",
@@ -16,11 +15,12 @@ const containerStyle = {
   paddingHorizontal: 15,
 };
 
-const Index = () => {
-  const [visible, setVisible] = useState(false);
+const AddContactModal = () => {
+  const [visible, setVisible] = useState(true);
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -28,7 +28,7 @@ const Index = () => {
         <Portal>
           <Modal
             visible={visible}
-            dismissable={false}
+            onDismiss={hideModal}
             contentContainerStyle={containerStyle}
           >
             <Text
@@ -59,10 +59,19 @@ const Index = () => {
             </Pressable>
           </Modal>
         </Portal>
-        <MainRoomComponent showModal={showModal} />
+        <View className="items-center justify-center" style={{ flex: 1 }}>
+          <Pressable
+            className="items-center justify-center w-1/2 py-3 bg-orange-700"
+            onPress={showModal}
+          >
+            <Text variant="titleMedium" className="text-white">
+              Open Modal
+            </Text>
+          </Pressable>
+        </View>
       </PaperProvider>
     </>
   );
 };
 
-export default Index;
+export default AddContactModal;
