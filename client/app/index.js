@@ -1,95 +1,231 @@
 import { Modal, Portal, Text, PaperProvider } from "react-native-paper";
 import { useState } from "react";
-import { Pressable, TextInput, View } from "react-native";
-import { Stack, Link } from "expo-router";
-
-// const contactList = [
-//   "Nadira",
-//   "Jodi",
-//   "Carissa",
-//   "Nadine",
-//   "Nadine",
-//   "Nadine",
-//   "Nadine",
-//   "Nadine",
-//   "Nadine",
-// ];
-
-const containerStyle = {
-  backgroundColor: "#FFF9E2",
-  width: "80%",
-  alignSelf: "center",
-  borderRadius: 15,
-  borderWidth: 4,
-  borderColor: "#C4E0B4",
-  paddingTop: 30,
-  paddingBottom: 20,
-  paddingHorizontal: 15,
-};
+import {
+  Pressable,
+  TextInput,
+  View,
+  Image,
+  ScrollView,
+  KeyboardAvoidingView,
+} from "react-native";
+import { Stack, Link, router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 
 const Index = () => {
-  const [visible, setVisible] = useState(true);
-
-  const showModal = () => setVisible(true);
-  const hideModal = () => setVisible(false);
-
   return (
     <>
-      <Link replace href="/mainRoom">
-        <Text>Go To Main Room</Text>
-      </Link>
-      {/* <Stack.Screen options={{ headerShown: false }} />
-      <PaperProvider>
-        <Portal>
-          <Modal
-            visible={visible}
-            onDismiss={hideModal}
-            contentContainerStyle={containerStyle}
-          >
-            <Text
-              className="w-full text-2xl text-center"
-              style={{ fontFamily: "Nunito_800ExtraBold" }}
-            >
-              Add Contact
-            </Text>
-            <Text className="mt-8" style={{ fontFamily: "Nunito_500Medium" }}>
-              Insert Username
-            </Text>
-            <TextInput className="border-[1px] border-[#BCA29A] rounded-full mt-2 py-2 px-4" />
-            <View className="items-center justify-center w-full mt-8 ">
-              <View className="w-1/2 bg-[#C4E0B4] border-[1px] border-[#95B584] rounded-full overflow-hidden">
-                <Pressable
-                  android_ripple={{ color: "#91c574" }}
-                  className="items-center justify-center py-3"
-                >
-                  <Text style={{ fontFamily: "Nunito_500Medium" }}>Add</Text>
-                </Pressable>
-              </View>
-            </View>
-
-            <Pressable onPress={hideModal}>
-              <Text className="w-full mt-3 text-center text-[#BCA29A]">
-                cancel
-              </Text>
-            </Pressable>
-          </Modal>
-        </Portal>
-        <View className="items-center justify-center" style={{ flex: 1 }}>
-          <Pressable
-            className="items-center justify-center w-1/2 py-3 bg-orange-700"
-            onPress={showModal}
-          >
-            <Text variant="titleMedium" className="text-white">
-              Open Modal
-            </Text>
-          </Pressable>
+      <Stack.Screen options={{ headerShown: false }} />
+      <StatusBar backgroundColor="#FFF9E2" barStyle="dark-content" />
+      <SafeAreaView className="bg-[#FFF9E2] px-[15%]" style={{ flex: 1 }}>
+        <View className="pt-[10%] items-center">
+          <Image source={require("../assets/cat-logo.png")} />
         </View>
-      </PaperProvider> */}
+        <View className="items-center w-full pt-4">
+          <Text className="text-2xl font-semibold">
+            <Text className="text-[#95B584]">Sign Up</Text> to the
+          </Text>
+          <Text className="text-2xl font-semibold">Encrypted Chatroom.</Text>
+        </View>
+        <View className="w-full mt-16">
+          <View className="items-center w-full mt-8">
+            <View
+              className="w-1/2 rounded-full border-2 border-[#95B584] bg-[#C4E0B4] overflow-hidden"
+              style={{ elevation: 5 }}
+            >
+              <Pressable
+                android_ripple={{ color: "#91c574" }}
+                className="items-center py-3 rounded-full"
+                onPress={() => {
+                  router.push("/login");
+                }}
+              >
+                <Text>Log in</Text>
+              </Pressable>
+            </View>
+          </View>
+          <View className="items-center w-full mt-4">
+            <View
+              className="w-1/2 rounded-full border-2 border-[#D6BD82] bg-[#FFE6AB] overflow-hidden"
+              style={{ elevation: 5 }}
+            >
+              <Pressable
+                android_ripple={{ color: "#e0be6f" }}
+                className="items-center py-3 rounded-full"
+                onPress={() => {
+                  router.push("/signup");
+                }}
+              >
+                <Text>sign up</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </SafeAreaView>
     </>
   );
 };
 
 export default Index;
+
+/* chat room */
+// <Stack.Screen options={{ headerShown: false }} />
+// <StatusBar backgroundColor="#FFE6AB" barStyle="dark-content" />
+// <SafeAreaView style={{ flex: 1 }}>
+//   {/* Header Section */}
+//   <View className="flex-row items-center px-8 py-4 bg-[#FFE6AB]">
+//     <Pressable>
+//       <Image source={require("../assets/chevron-left.png")} />
+//     </Pressable>
+//     <Text
+//       className="ml-6 text-2xl"
+//       style={{ fontFamily: "Nunito_700Bold" }}
+//     >
+//       Nadira
+//     </Text>
+//   </View>
+
+//   {/* Body */}
+//   <ScrollView className="bg-[#FFF9E2] pt-8" style={{ flex: 1 }}>
+//     {/* Left Component */}
+//     <View className="items-start w-full pl-6 mb-6">
+//       <View className="bg-[#FFE6AB] max-w-[70%] py-2 px-4 rounded-t-xl rounded-br-xl">
+//         <Text
+//           className="text-balance"
+//           style={{ fontFamily: "Nunito_400Regular" }}
+//         >
+//           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+//         </Text>
+//       </View>
+//       <Pressable>
+//         <Text
+//           className="text-[#BCA29A] mt-1"
+//           style={{ fontFamily: "Nunito_400Regular" }}
+//         >
+//           see encrypted text
+//         </Text>
+//       </Pressable>
+//     </View>
+
+//     {/* Right Component */}
+//     <View className="items-end w-full pr-6 mb-6">
+//       <View className="bg-[#C4E0B4] max-w-[70%] py-2 px-4 rounded-t-xl rounded-bl-xl">
+//         <Text style={{ fontFamily: "Nunito_400Regular" }}>
+//           Suspendisse ultrices, mi nec rutrum fringilla, nibh nunc
+//           consectetur lorem, quis eleifend erat est at purus.
+//         </Text>
+//       </View>
+//       <Pressable>
+//         <Text
+//           className="text-[#BCA29A] mt-1"
+//           style={{ fontFamily: "Nunito_400Regular" }}
+//         >
+//           see encrypted text
+//         </Text>
+//       </Pressable>
+//     </View>
+
+//     {/* Right Component */}
+//     <View className="items-end w-full pr-6 mb-6">
+//       <View className="bg-[#C4E0B4] max-w-[70%] py-2 px-4 rounded-t-xl rounded-bl-xl">
+//         <Text style={{ fontFamily: "Nunito_400Regular" }}>
+//           Aenean vitae magna tempor, feugiat justo ac, viverra mi. Quisque
+//           tristique suscipit sodales. Etiam non ullamcorper sapien.
+//         </Text>
+//       </View>
+//       <Pressable>
+//         <Text
+//           className="text-[#BCA29A] mt-1"
+//           style={{ fontFamily: "Nunito_400Regular" }}
+//         >
+//           see encrypted text
+//         </Text>
+//       </Pressable>
+//     </View>
+
+//     {/* Right Component - File */}
+//     <View className="items-end w-full pr-6 mb-6">
+//       <View className="bg-[#C4E0B4] max-w-[70%] py-3 px-4 rounded-t-xl rounded-bl-xl flex-row items-center">
+//         <Text style={{ fontFamily: "Nunito_400Regular" }}>
+//           kriptografinkoding.pdf
+//         </Text>
+//         <Image source={require("../assets/file.png")} className="ml-2" />
+//       </View>
+//       <View className="flex-row items-center mt-1 gap-x-1">
+//         <Pressable>
+//           <Text
+//             className="text-[#BCA29A] mt-1"
+//             style={{ fontFamily: "Nunito_400Regular" }}
+//           >
+//             download file
+//           </Text>
+//         </Pressable>
+//         <Text
+//           className="text-[#BCA29A] mt-1"
+//           style={{ fontFamily: "Nunito_400Regular" }}
+//         >
+//           |
+//         </Text>
+//         <Pressable>
+//           <Text
+//             className="text-[#BCA29A] mt-1"
+//             style={{ fontFamily: "Nunito_400Regular" }}
+//           >
+//             download file
+//           </Text>
+//         </Pressable>
+//       </View>
+//     </View>
+
+//     {/* Left Component - File */}
+//     <View className="items-start w-full pl-6 mb-6">
+//       <View className="bg-[#FFE6AB] max-w-[70%] py-3 px-4 rounded-t-xl rounded-br-xl flex-row items-center">
+//         <Text style={{ fontFamily: "Nunito_400Regular" }}>
+//           kriptografinkoding.pdf
+//         </Text>
+//         <Image source={require("../assets/file.png")} className="ml-2" />
+//       </View>
+//       <View className="flex-row items-center mt-1 gap-x-1">
+//         <Pressable>
+//           <Text
+//             className="text-[#BCA29A] mt-1"
+//             style={{ fontFamily: "Nunito_400Regular" }}
+//           >
+//             download file
+//           </Text>
+//         </Pressable>
+//         <Text
+//           className="text-[#BCA29A] mt-1"
+//           style={{ fontFamily: "Nunito_400Regular" }}
+//         >
+//           |
+//         </Text>
+//         <Pressable>
+//           <Text
+//             className="text-[#BCA29A] mt-1"
+//             style={{ fontFamily: "Nunito_400Regular" }}
+//           >
+//             download file
+//           </Text>
+//         </Pressable>
+//       </View>
+//     </View>
+//   </ScrollView>
+//   {/* Send Message */}
+//   <View className="h-16 bg-[#C4E0B4] px-4 flex-row items-center justify-between">
+//     <Pressable>
+//       <Image source={require("../assets/add-file.png")} />
+//     </Pressable>
+//     <TextInput
+//       placeholder="type here..."
+//       className="border-[1px] rounded-xl mx-4 h-10 px-4"
+//       style={{ flex: 1 }}
+//     />
+//     <Pressable>
+//       <Image source={require("../assets/send-message.png")} />
+//     </Pressable>
+//   </View>
+// </SafeAreaView>
 
 /* mainRoom */
 

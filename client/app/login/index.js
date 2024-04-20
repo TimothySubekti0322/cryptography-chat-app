@@ -42,6 +42,7 @@ const Login = () => {
               <Pressable
                 android_ripple={{ color: "#91c574" }}
                 className="items-center py-3 rounded-full"
+                onPress={() => router.replace("../mainRoom")}
               >
                 <Text>Log in</Text>
               </Pressable>

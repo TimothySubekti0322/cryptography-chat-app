@@ -1,16 +1,17 @@
+import { Text } from "react-native-paper";
+import { useState } from "react";
 import {
-  Image,
-  KeyboardAvoidingView,
   Pressable,
-  StatusBar,
-  Text,
   TextInput,
   View,
+  Image,
+  KeyboardAvoidingView,
 } from "react-native";
+import { Stack, Link } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link, Stack, router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
-const SignUp = () => {
+const Index = () => {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -27,11 +28,8 @@ const SignUp = () => {
             <Text className="text-2xl font-semibold">Encrypted Chatroom.</Text>
           </View>
           <View className="items-start w-full mt-12">
-            <Text className="text-start">Username</Text>
+            <Text className="text-start">choose 2 random number</Text>
             <TextInput className="rounded-full border-2 border-[#BCA29A] w-full h-12 px-4 mt-2" />
-          </View>
-          <View className="items-start w-full mt-4">
-            <Text className="text-start">Password</Text>
             <TextInput className="rounded-full border-2 border-[#BCA29A] w-full h-12 px-4 mt-2" />
           </View>
           <View className="items-center w-full mt-8">
@@ -42,7 +40,6 @@ const SignUp = () => {
               <Pressable
                 android_ripple={{ color: "#e0be6f" }}
                 className="items-center py-3 rounded-full"
-                onPress={() => router.replace("../login")}
               >
                 <Text>sign up</Text>
               </Pressable>
@@ -62,4 +59,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default Index;

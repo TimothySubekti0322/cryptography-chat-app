@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 
 const contactList = [
   "Nadira",
@@ -45,6 +45,7 @@ const MainRoomComponent = ({ showModal }) => {
                 <Pressable
                   className="flex-row items-center w-full py-3"
                   android_ripple={{ color: "#DAD4C0" }}
+                  onPress={() => router.push("../chatRoom")}
                 >
                   <Image source={require("../../assets/contact-avatar.png")} />
                   <View className="flex-col ml-4">
@@ -76,6 +77,7 @@ const MainRoomComponent = ({ showModal }) => {
             <Pressable
               className="flex-row items-center px-2 py-1"
               android_ripple={{ color: "#E5242B" }}
+              onPress={() => router.push("/")}
             >
               <Text>Log Out</Text>
               <Image
