@@ -13,6 +13,9 @@ import { Link, Stack, router } from "expo-router";
 import { CredentialContext } from "../../store/context/credential-context";
 
 const SignUp = () => {
+  // Save username and password to Credential Context
+  const credentialCtx = useContext(CredentialContext);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -47,8 +50,6 @@ const SignUp = () => {
       console.log("Username: ", username);
       console.log("Password: ", password);
 
-      // Save username and password to Credential Context
-      const credentialCtx = useContext(CredentialContext);
       credentialCtx.setUsername(username);
       credentialCtx.setPassword(password);
 
