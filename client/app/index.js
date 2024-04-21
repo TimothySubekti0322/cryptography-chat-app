@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Stack } from "expo-router";
 import { Link, router } from "expo-router";
+import { useState } from "react";
 
 const contactList = [
   "Nadira",
@@ -24,7 +25,23 @@ const contactList = [
 ];
 
 const Index = () => {
-  return <></>;
+  // [ publicKey, setPublicKey ] = useState();
+  // [ privateKey, setPrivateKey ] = useState();
+  // console.log("test");
+  
+  // const [ publicKey, privateKey ] = generateRSAKeyPair(22123n, 25951n);
+  // console.log(publicKey, privateKey)
+  // const message = "12345";
+  // const encryptedMessage = rsaEncrypt(message, publicKey);
+  // console.log("Encrypted Message:", encryptedMessage);
+  // const decryptedMessage = rsaDecrypt(encryptedMessage, privateKey);
+  // console.log("Decrypted Message:", decryptedMessage);
+
+  return <>
+    {/* <Text>
+      { publicKey }
+    </Text> */}
+  </>;
 };
 
 export default Index;
