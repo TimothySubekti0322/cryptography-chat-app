@@ -14,10 +14,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-const multer = require("multer");
-
+// image upload
 const storage = require("./storage");
 const upload = require("./upload");
+
+const userRoutes = require("./routes/users");
+const roomRoutes = require("./routes/rooms");
+const messageRoutes = require("./routes/messages");
 
 socketIO.on("connection", (socket) => {
   console.log(`${socket.id} user is just connected`);
@@ -28,10 +31,15 @@ socketIO.on("connection", (socket) => {
   });
 });
 
+app.use("/user", userRoutes);
+app.use("/room", roomRoutes);
+app.use("/message", messageRoutes);
+
 app.get("/welcome", (req, res) => {
   res.json({ message: "Welcome to the API" });
 });
 
+// Try Upload
 app.post("/upload", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
