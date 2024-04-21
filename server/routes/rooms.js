@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
       };
       roomsList.push(data);
     });
-    res.status(200).send(roomsList);
+    res.status(200).send({ message: "success", rooms: roomsList, status: 200 });
   } catch (error) {
     res.status(500).send({ error });
   }
@@ -29,7 +29,12 @@ router.get("/:id", async (req, res) => {
     const { id } = req.params;
     const roomsDb = db.collection("rooms");
     const room = await roomsDb.doc(id).get();
-    res.status(200).send(room.data());
+    const roomData = {
+      id: room.id,
+      ...room.data(),
+    };
+
+    res.status(200).send({ message: "success", room: roomData, status: 200 });
   } catch (error) {
     res.status(500).send({ error });
   }
@@ -53,7 +58,15 @@ router.post("/", async (req, res) => {
       usernames: [username1, username2],
     });
 
-    res.status(200).send({ response });
+    const docId = response._path.segments[1];
+
+    const addingMessageSubCollection = await db
+      .collection("rooms")
+      .doc(docId)
+      .collection("messages")
+      .add({});
+
+    res.status(200).send({ message: "success", status: 200 });
   } catch (error) {
     res.status(500).send({ error });
   }
