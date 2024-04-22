@@ -36,7 +36,7 @@ const Index = () => {
         </View>
         <View className="items-center w-full pt-4">
           <Text className="text-2xl font-semibold">
-            <Text className="text-[#95B584]">Sign Up</Text> to the
+            <Text className="text-[#95B584]">Welcome</Text> to the
           </Text>
           <Text className="text-2xl font-semibold">Encrypted Chatroom.</Text>
         </View>

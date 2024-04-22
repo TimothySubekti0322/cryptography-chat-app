@@ -128,9 +128,9 @@ const Index = () => {
                 
                   <View>
                     {mess.type == "file" ?
-                      <RightFileMessage fileName={mess.url} cypheredFileName={mess.urlCipher} />
+                      <RightFileMessage fileName={mess.url} cypheredFileName={mess.urlCipher}/>
                       :
-                      <RightTextMessage message={mess.message} />
+                      <RightTextMessage message={mess.message} cipher={mess.cipher} />
                     }
                   </View>
                   :
@@ -138,7 +138,7 @@ const Index = () => {
                     {mess.type == "file" ?
                       <LeftFileMessage fileName={mess.url} cypheredFileName={mess.urlCipher} />
                       :
-                      <LeftTextMessage message={mess.message} />
+                      <LeftTextMessage message={mess.message} cipher={mess.cipher} />
                     }
                   </View>
                 }
