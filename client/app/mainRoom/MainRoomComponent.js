@@ -35,11 +35,11 @@ const MainRoomComponent = ({ showModal, visible }) => {
 
   const [contactList, setContactList] = useState([]);
 
-  const [keys, setKeys] = useState({
-    publicKey: 0n,
-    privateKey: 0n,
-    modulus: 0n,
-  });
+  // const [keys, setKeys] = useState({
+  //   publicKey: 0n,
+  //   privateKey: 0n,
+  //   modulus: 0n,
+  // });
 
   const downloadPrivateKey = async () => {
     try {
@@ -48,7 +48,7 @@ const MainRoomComponent = ({ showModal, visible }) => {
       const privateKey = `(${d},${n})`;
       console.log("privateKey", privateKey);
       await createTextFileFromPlainText(privateKey, "*.pri");
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const downloadPublicKey = async () => {
@@ -58,7 +58,7 @@ const MainRoomComponent = ({ showModal, visible }) => {
       const publicKey = `(${e},${n})`;
       console.log("publicKey", publicKey);
       await createTextFileFromPlainText(publicKey, "*.pub");
-    } catch (error) {}
+    } catch (error) { }
   };
 
   useEffect(() => {
@@ -76,11 +76,11 @@ const MainRoomComponent = ({ showModal, visible }) => {
 
         const responseUser = await axios.get(`${API_DEV}/user/${username}`);
 
-        setKeys({
-          publicKey: responseUser.data.e,
-          privateKey: responseUser.data.d,
-          modulus: responseUser.data.n,
-        });
+        // setKeys({
+        //   publicKey: responseUser.data.e,
+        //   privateKey: responseUser.data.d,
+        //   modulus: responseUser.data.n,
+        // });
 
         const responseRooms = await axios.get(
           `${API_DEV}/rooms-and-messages/${username}`
@@ -97,28 +97,6 @@ const MainRoomComponent = ({ showModal, visible }) => {
     };
     loadData();
   }, []);
-
-  async function downloadPublic() {
-    //masih returns null
-    try {
-      const pubName = username + ".pub";
-      const pubPath = FileSystem.documentDirectory;
-      const file = await FileSystem.writeAsStringAsync(
-        pubPath + pubName,
-        "(" + keys.publicKey + ", " + keys.modulus + ")",
-        { encoding: FileSystem.EncodingType.UTF8 }
-      );
-      console.log(file);
-
-      saveFile(file.uri, pubName, "text/*");
-    } catch (error) {
-      console.log("Error creating or writing to file:", error);
-    }
-  }
-
-  const downloadPrivate = () => {
-    // samain kalo downloadPublic udah bisa !!
-  };
 
   async function saveFile(uri, filename, mimetype) {
     // copas dr utils
