@@ -14,6 +14,7 @@ import { CredentialContext } from "../../store/context/credential-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import API_DEV from "../../static/api";
+import { ActivityIndicator } from "react-native-paper";
 
 const Login = () => {
   const credentialCtx = useContext(CredentialContext);
@@ -23,6 +24,8 @@ const Login = () => {
 
   const [usernameError, setUsernameError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
+
+  const [loading, setLoading] = useState(false);
 
   const checkCredentials = () => {
     if (!username) {
@@ -48,6 +51,7 @@ const Login = () => {
     const isValid = checkCredentials();
     if (isValid) {
       try {
+        setLoading(true);
         const formData = {
           username: username,
           password: password,
@@ -55,8 +59,10 @@ const Login = () => {
         const response = await axios.post(`${API_DEV}/user/auth`, formData);
 
         if (response.data.message === "User not found") {
+          setLoading(false);
           setUsernameError("User not found");
         } else if (response.data.message === "Invalid password") {
+          setLoading(false);
           setPasswordError("Invalid password");
         } else if (response.data.message === "success") {
           setUsernameError(null);
@@ -70,9 +76,12 @@ const Login = () => {
           AsyncStorage.setItem("username", username);
           AsyncStorage.setItem("password", password);
 
+          setLoading(false);
+
           router.replace("../mainRoom");
         }
       } catch (error) {
+        setLoading(false);
         alert(error.message);
       }
     }
@@ -129,7 +138,11 @@ const Login = () => {
                 className="items-center py-3 rounded-full"
                 onPress={handleLogin}
               >
-                <Text>Log in</Text>
+                {loading ? (
+                  <ActivityIndicator animating={true} color="#221a07" />
+                ) : (
+                  <Text>Log in</Text>
+                )}
               </Pressable>
             </View>
           </View>
