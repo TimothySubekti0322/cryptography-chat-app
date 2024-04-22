@@ -9,27 +9,62 @@ const db = firebaseAdmin.firestore();
 router.get("/:roomId", async (req, res) => {
   try {
     const { roomId } = req.params;
-    const roomReference = db.collection("rooms").doc(roomId);
+    const roomReference = await db.collection("rooms").doc(roomId).get();
+
     if (!roomReference.exists) {
-      res.status(404).send({ message: "Room not found" });
+      res.status(200).send({ message: "room doesn't exist", status: 404 });
       return;
     }
 
-    const messages = roomReference.collection("messages");
-
-    if (!messages.exists) {
-      res.status(200).send({ messages: [], status: 404 });
-      return;
-    }
+    const messages = await db
+      .collection("rooms")
+      .doc(roomId)
+      .collection("messages")
+      .get();
 
     const messagesList = [];
-    const messagesData = await messages.get();
-    messagesData.forEach((doc) => {
+    messages.forEach((doc) => {
       messagesList.push(doc.data());
     });
 
-    res.status(200).send(messagesList);
+    messagesList.splice(messagesList.length - 1);
+
+    res
+      .status(200)
+      .send({ message: "success", data: messagesList, status: 200 });
   } catch (error) {
+    res.status(500).send({ error });
+  }
+});
+
+// add message
+router.post("/:roomId", async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const { sender, message, cipher } = req.body;
+
+    const roomReference = await db.collection("rooms").doc(roomId).get();
+
+    if (!roomReference.exists) {
+      res.status(200).send({ message: "Room not found", status: 404 });
+      return;
+    }
+
+    const response = await db
+      .collection("rooms")
+      .doc(roomId)
+      .collection("messages")
+      .add({
+        sender: sender,
+        type: "text",
+        message: message,
+        cipher: cipher,
+        createdAt: new Date(),
+      });
+
+    res.status(200).send({ message: "Success", status: 200 });
+  } catch (error) {
+    console.log("error = ", error);
     res.status(500).send({ error });
   }
 });

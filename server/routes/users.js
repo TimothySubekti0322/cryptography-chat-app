@@ -11,9 +11,13 @@ router.get("/", async (req, res) => {
     const users = await usersDb.get();
     const usersList = [];
     users.forEach((doc) => {
-      usersList.push(doc.data());
+      const data = {
+        id: doc.id,
+        ...doc.data(),
+      };
+      usersList.push(data);
     });
-    res.status(200).send(usersList);
+    res.status(200).send({ message: "success", users: usersList, status: 200});
   } catch (error) {
     res.status(500).send({ error });
   }
@@ -30,7 +34,13 @@ router.get("/:username", async (req, res) => {
       res.status(200).send({ message: "User not found", status: 404 });
       return;
     }
-    res.status(200).send(user.data());
+
+    const userData = {
+      id: user.id,
+      ...user.data(),
+    };
+
+    res.status(200).send({ message: "success", user: userData, status: 200});
   } catch (error) {
     res.status(500).send({ error });
   }
@@ -56,7 +66,36 @@ router.post("/", async (req, res) => {
       d,
       n,
     });
-    res.status(200).send({ response });
+    res.status(200).send({ message: "success", status: 200 });
+  } catch (error) {
+    res.status(500).send({ error });
+  }
+});
+
+//authenticate user
+
+router.post("/auth", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const usersDb = db.collection("users");
+    const user = await usersDb.doc(username).get();
+
+    if (!user.exists) {
+      res.status(200).send({ message: "User not found", status: 404 });
+      return;
+    }
+
+    const userData = {
+      id: user.id,
+      ...user.data(),
+    };
+
+    if (userData.password !== password) {
+      res.status(200).send({ message: "Invalid password", status: 404 });
+      return;
+    }
+
+    res.status(200).send({ message: "success", user: userData, status: 200 });
   } catch (error) {
     res.status(500).send({ error });
   }
