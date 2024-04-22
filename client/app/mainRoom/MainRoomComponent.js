@@ -9,7 +9,7 @@ import {
   Text,
   View,
   Alert,
-  Button
+  Button,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -35,6 +35,11 @@ const MainRoomComponent = ({ showModal, visible }) => {
 
   const [contactList, setContactList] = useState([]);
 
+  const [keys, setKeys] = useState({
+    publicKey: 0n,
+    privateKey: 0n,
+    modulus: 0n,
+  });
 
   const downloadPrivateKey = async () => {
     try {
@@ -69,14 +74,12 @@ const MainRoomComponent = ({ showModal, visible }) => {
           ]);
         }
 
-        const responseUser = await axios.get( 
-          `${API_DEV}/user/${username}`
-        );
+        const responseUser = await axios.get(`${API_DEV}/user/${username}`);
 
         setKeys({
           publicKey: responseUser.data.e,
           privateKey: responseUser.data.d,
-          modulus: responseUser.data.n
+          modulus: responseUser.data.n,
         });
 
         const responseRooms = await axios.get(
@@ -95,11 +98,16 @@ const MainRoomComponent = ({ showModal, visible }) => {
     loadData();
   }, []);
 
-  async function downloadPublic () { //masih returns null
-    try{
+  async function downloadPublic() {
+    //masih returns null
+    try {
       const pubName = username + ".pub";
       const pubPath = FileSystem.documentDirectory;
-      const file = await FileSystem.writeAsStringAsync((pubPath + pubName), ("(" + keys.publicKey+ ", "+ keys.modulus+ ")"), { encoding: FileSystem.EncodingType.UTF8 });
+      const file = await FileSystem.writeAsStringAsync(
+        pubPath + pubName,
+        "(" + keys.publicKey + ", " + keys.modulus + ")",
+        { encoding: FileSystem.EncodingType.UTF8 }
+      );
       console.log(file);
 
       saveFile(file.uri, pubName, "text/*");
@@ -110,9 +118,10 @@ const MainRoomComponent = ({ showModal, visible }) => {
 
   const downloadPrivate = () => {
     // samain kalo downloadPublic udah bisa !!
-  }
+  };
 
-  async function saveFile(uri, filename, mimetype) { // copas dr utils
+  async function saveFile(uri, filename, mimetype) {
+    // copas dr utils
     if (Platform.OS === "android") {
       const permissions =
         await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
@@ -230,7 +239,7 @@ const MainRoomComponent = ({ showModal, visible }) => {
               {contactList.map((contact) => (
                 <Contact
                   key={contact.id}
-                  id = {contact.id}
+                  id={contact.id}
                   contact={contact.username}
                   lastMessage={contact.lastMessage}
                 />

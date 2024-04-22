@@ -29,6 +29,8 @@ router.get("/:roomId", async (req, res) => {
 
     messagesList.splice(messagesList.length - 1);
 
+    messagesList.reverse();
+
     res
       .status(200)
       .send({ message: "success", data: messagesList, status: 200 });

@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import API_DEV from "../../../../static/api";
 
-import { useRoute } from '@react-navigation/native';
+import { useRoute } from "@react-navigation/native";
 import { useContext, useEffect, useState } from "react";
 import { CredentialContext } from "../../../../store/context/credential-context";
 
@@ -21,7 +21,7 @@ import {
   TextInput,
   View,
   Alert,
-  Button
+  Button,
 } from "react-native";
 
 import LeftTextMessage from "../../../../components/leftTextMessage";
@@ -45,7 +45,7 @@ const Index = () => {
   const [keys, setKeys] = useState({
     publicKey: 0n,
     privateKey: 0n,
-    modulus: 0n
+    modulus: 0n,
   });
 
   useEffect(() => {
@@ -62,25 +62,22 @@ const Index = () => {
           ]);
         }
 
-        const responseUser = await axios.get(
-          `${API_DEV}/user/${username}`
-        );
+        const responseUser = await axios.get(`${API_DEV}/user/${username}`);
 
 
 
         setKeys({
           publicKey: responseUser.data.e,
           privateKey: responseUser.data.d,
-          modulus: responseUser.data.n
+          modulus: responseUser.data.n,
         });
 
-        const responseMessages = await axios.get(
-          `${API_DEV}/message/${id}`
-        );
+        const responseMessages = await axios.get(`${API_DEV}/message/${id}`);
 
-        console.log("responseMessage = ", responseMessages.data)
+        console.log("responseMessage = ", responseMessages.data);
 
         setMessagesList(responseMessages.data.data);
+
 
         const responseSendKey = await axios.get(
           `${API_DEV}/user/${friend}`
@@ -140,7 +137,7 @@ const Index = () => {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <StatusBar backgroundColor="#FFE6AB" barStyle="dark-content" />
-      {loadingData ?
+      {loadingData ? (
         <SafeAreaView style={{ flex: 1 }}>
           {/* Header Section */}
           <View className="flex-row items-center px-8 py-4 bg-[#FFE6AB]">
@@ -155,7 +152,7 @@ const Index = () => {
             </Text>
           </View>
         </SafeAreaView>
-        :
+      ) : (
         <SafeAreaView style={{ flex: 1 }}>
           {/* Header Section */}
           <View className="flex-row items-center px-8 py-4 bg-[#FFE6AB]">
@@ -174,29 +171,44 @@ const Index = () => {
           <ScrollView className="bg-[#FFF9E2] pt-8" style={{ flex: 1 }}>
             {messagesList.map((mess) => (
               <View key={mess.id}>
-                {mess.sender.match(username)?
-                
+                {mess.sender.match(username) ? (
                   <View>
-                    {mess.type == "file" ?
-                      <RightFileMessage fileName={mess.url} cypheredFileName={mess.urlCipher}/>
-                      :
-                      <RightTextMessage message={mess.message} cipher={mess.cipher} />
-                    }
+                    {mess.type == "file" ? (
+                      <RightFileMessage
+                        fileName={mess.fileName}
+                        cypherFileName={mess.fileNameCipher}
+                        url={mess.url}
+                        urlCipher={mess.urlCipher}
+                      />
+                    ) : (
+                      <RightTextMessage
+                        message={mess.message}
+                        cipher={mess.cipher}
+                      />
+                    )}
                   </View>
-                  :
+                ) : (
                   <View>
-                    {mess.type == "file" ?
-                      <LeftFileMessage fileName={mess.url} cypheredFileName={mess.urlCipher} />
-                      :
-                      <LeftTextMessage message={mess.message} cipher={mess.cipher} />
-                    }
+                    {mess.type == "file" ? (
+                      <LeftFileMessage
+                        fileName={mess.fileName}
+                        cypherFileName={mess.fileNameCipher}
+                        url={mess.url}
+                        urlCipher={mess.urlCipher}
+                      />
+                    ) : (
+                      <LeftTextMessage
+                        message={mess.message}
+                        cipher={mess.cipher}
+                      />
+                    )}
                   </View>
-                }
+                )}
               </View>
             ))}
+
             <Text className="text-[#BC4B48] mt-1">{sendMessageError}</Text>
             
-
           </ScrollView>
           {/* Send Message */}
           <View className="h-16 bg-[#C4E0B4] px-4 flex-row items-center justify-between">
@@ -215,11 +227,9 @@ const Index = () => {
             </Pressable>
           </View>
         </SafeAreaView>
-      }
+      )}
     </>
-
   );
-
 };
 
 export default Index;
