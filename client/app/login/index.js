@@ -70,11 +70,12 @@ const Login = () => {
           // Save username and password to Credential Context
           credentialCtx.setUsername(username);
           credentialCtx.setPassword(password);
-
-          console.log("");
           // Save username and password to AsyncStorage
           AsyncStorage.setItem("username", username);
           AsyncStorage.setItem("password", password);
+          AsyncStorage.setItem("e", response.data.user.e.toString());
+          AsyncStorage.setItem("n", response.data.user.n.toString());
+          AsyncStorage.setItem("d", response.data.user.d.toString());
 
           setLoading(false);
 

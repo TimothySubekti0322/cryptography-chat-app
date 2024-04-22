@@ -15,7 +15,12 @@ export default function App() {
     );
 
     // Log the download result
-    console.log(result.headers["content-type"]);
+    console.log("result.uri ------------------- ", result.uri);
+    console.log("filename -------------------- ", filename);
+    console.log(
+      "result.header ---------------- ",
+      result.headers["content-type"]
+    );
 
     // Save the downloaded file
     saveFile(result.uri, filename, result.headers["content-type"]);
@@ -30,6 +35,7 @@ export default function App() {
         const base64 = await FileSystem.readAsStringAsync(uri, {
           encoding: FileSystem.EncodingType.Base64,
         });
+        console.log("base64-------------------------", base64);
         try {
           console.log("permissions.directoryUri = ", permissions.directoryUri);
           console.log("filename = ", filename);
@@ -60,9 +66,31 @@ export default function App() {
       shareAsync(uri);
     }
   }
+
+  const text = "(223,568)";
+
+  async function createTextFileFromPlainText(text, fileName) {
+    try {
+      // Write the text to a file
+      const fileUri = FileSystem.documentDirectory + fileName;
+      await FileSystem.writeAsStringAsync(fileUri, text);
+
+      console.log("Text file created successfully:", fileUri);
+
+      saveFile(fileUri, fileName + ".txt", "text/plain");
+    } catch (error) {
+      console.error("Error creating text file:", error);
+      throw error;
+    }
+  }
+
+  const handleClick = async () => {
+    await createTextFileFromPlainText(text, "plainteks");
+  };
   return (
     <SafeAreaView className="items-center justify-center" style={{ flex: 1 }}>
       <Button title="Download" onPress={download} />
+      <Button title="Download Txt file" onPress={handleClick} />
     </SafeAreaView>
   );
 }

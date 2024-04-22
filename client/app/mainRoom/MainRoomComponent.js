@@ -21,6 +21,8 @@ import axios from "axios";
 
 import { ActivityIndicator } from "react-native-paper";
 
+import { saveFile, createTextFileFromPlainText } from "../../utils/saveFile";
+
 const MainRoomComponent = ({ showModal, visible }) => {
   const credentialCtx = useContext(CredentialContext);
 
@@ -29,6 +31,26 @@ const MainRoomComponent = ({ showModal, visible }) => {
   const [loadingData, setLoadingData] = useState(false);
 
   const [contactList, setContactList] = useState([]);
+
+  const downloadPrivateKey = async () => {
+    try {
+      const d = await AsyncStorage.getItem("d");
+      const n = await AsyncStorage.getItem("n");
+      const privateKey = `(${d},${n})`;
+      console.log("privateKey", privateKey);
+      await createTextFileFromPlainText(privateKey, "*.pri");
+    } catch (error) {}
+  };
+
+  const downloadPublicKey = async () => {
+    try {
+      const e = await AsyncStorage.getItem("e");
+      const n = await AsyncStorage.getItem("n");
+      const publicKey = `(${e},${n})`;
+      console.log("publicKey", publicKey);
+      await createTextFileFromPlainText(publicKey, "*.pub");
+    } catch (error) {}
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -109,7 +131,18 @@ const MainRoomComponent = ({ showModal, visible }) => {
         <SafeAreaView className="" style={{ flex: 1 }}>
           <View className="flex-row items-center w-full px-6 py-6 bg-[#C4E0B4]">
             <Image source={require("../../assets/header-avatar.png")} />
-            <Text className="ml-4 text-2xl font-bold">{username}</Text>
+            <View className="items-start ml-4 gap-y-1">
+              <Text className="text-2xl font-bold">{username}</Text>
+              <View className="flex-row items-center gap-x-1">
+                <Pressable onPress={downloadPrivateKey}>
+                  <Text className="text-[#c69c8f]">download private key</Text>
+                </Pressable>
+                <Text>|</Text>
+                <Pressable onPress={downloadPublicKey}>
+                  <Text className="text-[#c69c8f]">public key</Text>
+                </Pressable>
+              </View>
+            </View>
           </View>
 
           {/* Contact List */}
