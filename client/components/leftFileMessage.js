@@ -1,7 +1,7 @@
 import { View, Text, Pressable, Image } from "react-native";
 import React from "react";
 
-const leftFileMessage = ({ fileName }) => {
+const leftFileMessage = ({ fileName, cypheredFileName }) => {
   return (
     <View className="items-start w-full pl-6 mb-6">
       <View className="bg-[#FFE6AB] max-w-[70%] py-3 px-4 rounded-t-xl rounded-br-xl flex-row items-center">

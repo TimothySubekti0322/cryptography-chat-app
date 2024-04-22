@@ -1,5 +1,6 @@
 import { shareAsync } from "expo-sharing";
 import * as FileSystem from "expo-file-system";
+import * as DocumentPicker from 'expo-document-picker';
 import { Platform } from "react-native";
 import React from "react";
 import { Button } from "react-native";

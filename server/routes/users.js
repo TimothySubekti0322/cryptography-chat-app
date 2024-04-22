@@ -40,6 +40,8 @@ router.get("/:username", async (req, res) => {
       ...user.data(),
     };
 
+    console.log("userData = ", userData);
+
     res.status(200).send({ message: "success", user: userData, status: 200});
   } catch (error) {
     res.status(500).send({ error });

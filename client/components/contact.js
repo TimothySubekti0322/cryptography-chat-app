@@ -3,13 +3,13 @@ import React from "react";
 
 import { router } from "expo-router";
 
-const Contact = ({ contact, lastMessage }) => {
+const Contact = ({ id, contact, lastMessage }) => {
   return (
     <View className="border-b-[1px] border-[#FCF6E0]">
       <Pressable
         className="flex-row items-center w-full py-3"
         android_ripple={{ color: "#DAD4C0" }}
-        onPress={() => router.push("../chatRoom")}
+        onPress={() => router.push(`../chatRoom/${id}/${contact}`)}
       >
         <Image source={require("../assets/contact-avatar.png")} />
         <View className="flex-col ml-4">

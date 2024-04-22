@@ -36,7 +36,7 @@ const Index = () => {
         </View>
         <View className="items-center w-full pt-4">
           <Text className="text-2xl font-semibold">
-            <Text className="text-[#95B584]">Sign Up</Text> to the
+            <Text className="text-[#95B584]">Welcome</Text> to the
           </Text>
           <Text className="text-2xl font-semibold">Encrypted Chatroom.</Text>
         </View>
@@ -53,7 +53,7 @@ const Index = () => {
                   router.push("/login");
                 }}
               >
-                <Text>Log in</Text>
+                <Text>Log In</Text>
               </Pressable>
             </View>
           </View>
@@ -69,7 +69,7 @@ const Index = () => {
                   router.push("/signup");
                 }}
               >
-                <Text>sign up</Text>
+                <Text>Sign Up</Text>
               </Pressable>
             </View>
           </View>

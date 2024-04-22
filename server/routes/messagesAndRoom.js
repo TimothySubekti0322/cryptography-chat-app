@@ -46,6 +46,7 @@ router.get("/:username", async (req, res) => {
         username: interlocutors,
         lastMessage: lastMessage,
       };
+      console.log(data);
       roomsList.push(data);
     }
 
