@@ -179,6 +179,7 @@ const MainRoomComponent = ({ showModal }) => {
               {contactList.map((contact) => (
                 <Contact
                   key={contact.id}
+                  id = {contact.id}
                   contact={contact.username}
                   lastMessage={contact.lastMessage}
                 />

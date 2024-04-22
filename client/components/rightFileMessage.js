@@ -1,7 +1,8 @@
 import { View, Text, Pressable, Image } from "react-native";
 import React from "react";
+import { encrypt } from "../utils/encrypt"
 
-const RightFileMessage = ({ fileName }) => {
+const RightFileMessage = ({ fileName, cypherFileName }) => {
   return (
     <View className="items-end w-full pr-6 mb-6">
       <View className="bg-[#C4E0B4] max-w-[70%] py-3 px-4 rounded-t-xl rounded-bl-xl flex-row items-center">
@@ -9,7 +10,7 @@ const RightFileMessage = ({ fileName }) => {
         <Image source={require("../assets/file.png")} className="ml-2" />
       </View>
       <View className="flex-row items-center mt-1 gap-x-1">
-        <Pressable>
+        <Pressable onPress={downloadFile}>
           <Text
             className="text-[#BCA29A] mt-1"
             style={{ fontFamily: "Nunito_400Regular" }}
@@ -23,12 +24,12 @@ const RightFileMessage = ({ fileName }) => {
         >
           |
         </Text>
-        <Pressable>
+        <Pressable onPress={downloadCypherFile}>
           <Text
             className="text-[#BCA29A] mt-1"
             style={{ fontFamily: "Nunito_400Regular" }}
           >
-            download file
+            download encrypted file
           </Text>
         </Pressable>
       </View>
