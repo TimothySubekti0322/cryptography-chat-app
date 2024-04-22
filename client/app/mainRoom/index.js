@@ -49,11 +49,9 @@ const Index = () => {
       console.log(response.data);
 
       if (response.data.message == "user not found") {
-        console.log("user not found");
         setLoading(false);
         setNewContactError("User not found");
       } else if (response.data.message == "success") {
-        console.log("success");
         setLoading(false);
         hideModal();
         setNewContactError(null);
