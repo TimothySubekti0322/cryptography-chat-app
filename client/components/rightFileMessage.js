@@ -1,25 +1,59 @@
 import { shareAsync } from "expo-sharing";
 import * as FileSystem from "expo-file-system";
-import * as DocumentPicker from 'expo-document-picker';
+import * as DocumentPicker from "expo-document-picker";
 
 import { View, Text, Pressable, Image } from "react-native";
 import React from "react";
-import { encrypt } from "../utils/encrypt"
-import { App } from "../app/downloadFileTest/index"
+import { encrypt } from "../utils/encrypt";
+import { App } from "../app/downloadFileTest/index";
+import { saveFile } from "../utils/saveFile";
 
-const RightFileMessage = ({ fileName, cypherFileName }) => {
-  // async function downloadFile() {
-  //   const result = await FileSystem.downloadAsync(
-  //     "https://res.cloudinary.com/djkckue0o/image/upload/v1713633552/pq4auddctp2hedunpdtr.pdf",
-  //     FileSystem.documentDirectory + fileName
-  //   );
+const RightFileMessage = ({ fileName, cypherFileName, url, urlCipher }) => {
+  console.log("fileName = ", fileName);
+  console.log("cypherFileName = ", cypherFileName);
+  console.log("url = ", url);
+  console.log("urlCipher = ", urlCipher);
+  async function downloadFile() {
+    const filename = fileName;
 
-  //   // Log the download result
-  //   console.log(result.headers["content-type"]);
+    const result = await FileSystem.downloadAsync(
+      url,
+      FileSystem.documentDirectory + filename
+    );
 
-  //   // Save the downloaded file
-  //   saveFile(result.uri, filename, result.headers["content-type"]);
-  // }
+    console.log("result --------------- ", result);
+
+    // Log the download result
+    console.log("result.uri ------------------- ", result.uri);
+    console.log("filename -------------------- ", filename);
+    console.log(
+      "result.header ---------------- ",
+      result.headers["Content-Type"]
+    );
+
+    // Save the downloaded file
+    await saveFile(result.uri, filename, result.headers["Content-Type"]);
+  }
+
+  async function downloadCipherFile() {
+    const filename = cypherFileName;
+
+    const result = await FileSystem.downloadAsync(
+      urlCipher,
+      FileSystem.documentDirectory + filename
+    );
+
+    // Log the download result
+    console.log("result.uri ------------------- ", result.uri);
+    console.log("filename -------------------- ", filename);
+    console.log(
+      "result.header ---------------- ",
+      result.headers["Content-Type"]
+    );
+
+    // Save the downloaded file
+    await saveFile(result.uri, filename, result.headers["Content-Type"]);
+  }
 
   return (
     <View className="items-end w-full pr-6 mb-6">
@@ -28,9 +62,7 @@ const RightFileMessage = ({ fileName, cypherFileName }) => {
         <Image source={require("../assets/file.png")} className="ml-2" />
       </View>
       <View className="flex-row items-center mt-1 gap-x-1">
-        <Pressable 
-        // onPress={downloadFile}
-        >
+        <Pressable onPress={downloadFile}>
           <Text
             className="text-[#BCA29A] mt-1"
             style={{ fontFamily: "Nunito_400Regular" }}
@@ -44,9 +76,7 @@ const RightFileMessage = ({ fileName, cypherFileName }) => {
         >
           |
         </Text>
-        <Pressable 
-        // onPress={downloadCypherFile}
-        >
+        <Pressable onPress={downloadCipherFile}>
           <Text
             className="text-[#BCA29A] mt-1"
             style={{ fontFamily: "Nunito_400Regular" }}
