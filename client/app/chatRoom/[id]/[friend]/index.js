@@ -12,6 +12,7 @@ import { Stack, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native-paper";
+import {encrypt} from "../../../../utils/encrypt"
 
 import {
   Image,
@@ -35,6 +36,11 @@ const Index = () => {
   const [loadingData, setLoadingData] = useState(false);
 
   const [messagesList, setMessagesList] = useState([]);
+  const [messageNew, setMessageNew] = useState("");
+
+  const [sendKey, setSendKey] = useState();
+  const [sendMessageError, setSendMessageError] = useState(null);
+
 
   const [keys, setKeys] = useState({
     publicKey: 0n,
@@ -58,6 +64,8 @@ const Index = () => {
 
         const responseUser = await axios.get(`${API_DEV}/user/${username}`);
 
+
+
         setKeys({
           publicKey: responseUser.data.e,
           privateKey: responseUser.data.d,
@@ -69,6 +77,16 @@ const Index = () => {
         console.log("responseMessage = ", responseMessages.data);
 
         setMessagesList(responseMessages.data.data);
+
+
+        const responseSendKey = await axios.get(
+          `${API_DEV}/user/${friend}`
+        );
+
+        setSendKey(responseSendKey.data.data);
+        console.log(sendKey);
+
+
       } catch (error) {
         Alert.alert("Error", error.message, [
           { text: "Back to Home", onPress: () => router.replace("/") },
@@ -80,6 +98,40 @@ const Index = () => {
     };
     loadData();
   }, []);
+
+
+  const sendMessage = async () => {
+    setLoadingData(true);
+    try {
+      const formData = {
+        "cipher": messageNew,
+        "createdAt": Date, 
+        "message": messageNew,
+        "sender": username,
+        "type": "text"
+      }
+
+      console.log(formData);
+      const response = await axios.post(`${API_DEV}/message`, formData)
+
+      console.log(response.data);
+
+      if (response.data.message == "user not found") {
+        console.log("user not found");
+        setLoading(false);
+        setNewContactError("User not found");
+      } else if (response.data.message == "success") {
+        console.log("success");
+        setLoading(false);
+        setSendMessageError(null);
+      }
+      // {"cipher": "xasaqw", "createdAt": [Object], "message": "hai tim", "sender": "jodi", "type": "text"}], "message": "success", "status": 200}
+    } catch (error) {
+      setLoading(false);
+      Alert.alert("Error", error.message);
+    }
+
+  }
 
   return (
     <>
@@ -154,6 +206,9 @@ const Index = () => {
                 )}
               </View>
             ))}
+
+            <Text className="text-[#BC4B48] mt-1">{sendMessageError}</Text>
+            
           </ScrollView>
           {/* Send Message */}
           <View className="h-16 bg-[#C4E0B4] px-4 flex-row items-center justify-between">
@@ -163,9 +218,11 @@ const Index = () => {
             <TextInput
               placeholder="type here..."
               className="border-[1px] rounded-xl mx-4 h-10 px-4"
+              value={messageNew}
+              onChangeText={(text) => setMessageNew(text)}
               style={{ flex: 1 }}
             />
-            <Pressable>
+            <Pressable onPress={sendMessage}>
               <Image source={require("../../../../assets/send-message.png")} />
             </Pressable>
           </View>
