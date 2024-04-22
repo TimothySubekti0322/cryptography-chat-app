@@ -20,6 +20,7 @@ router.get("/:roomId", async (req, res) => {
       .collection("rooms")
       .doc(roomId)
       .collection("messages")
+      .orderBy("createdAt", "asc")
       .get();
 
     const messagesList = [];
@@ -29,7 +30,7 @@ router.get("/:roomId", async (req, res) => {
 
     messagesList.splice(messagesList.length - 1);
 
-    messagesList.reverse();
+    // messagesList.reverse();
 
     res
       .status(200)
@@ -61,7 +62,7 @@ router.post("/:roomId", async (req, res) => {
         type: "text",
         message: message,
         cipher: cipher,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       });
 
     res.status(200).send({ message: "Success", status: 200 });

@@ -2,6 +2,7 @@ import { shareAsync } from "expo-sharing";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import API_DEV from "../../../../static/api";
+import * as DocumentPicker from "expo-document-picker";
 
 import { useRoute } from "@react-navigation/native";
 import { useContext, useEffect, useState } from "react";
@@ -12,7 +13,7 @@ import { Stack, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native-paper";
-import {encrypt} from "../../../../utils/encrypt"
+import { encrypt } from "../../../../utils/encrypt";
 
 import {
   Image,
@@ -41,12 +42,63 @@ const Index = () => {
   const [sendKey, setSendKey] = useState();
   const [sendMessageError, setSendMessageError] = useState(null);
 
-
   const [keys, setKeys] = useState({
     publicKey: 0n,
     privateKey: 0n,
     modulus: 0n,
   });
+
+  /* ------------------------ Send File -------------------------------- */
+  const [doc, setDoc] = useState(null);
+  // const [loading, setLoading] = useState(false);
+  const uploadDocument = async () => {
+    // Pick the document
+    try {
+      const response = await DocumentPicker.getDocumentAsync({
+        type: "*/*",
+        copyToCacheDirectory: true,
+      });
+
+      console.log("response = ", response.canceled);
+      if (!response.canceled) {
+        console.log("success");
+        const { name, size, uri } = response.assets[0];
+        const nameParts = name.split(".");
+        const fileType = nameParts[nameParts.length - 1];
+        const fileToUpload = {
+          name: name,
+          size: size,
+          uri: uri,
+          type: "application/" + fileType,
+        };
+        console.log(fileToUpload, "...............file");
+        // setDoc(fileToUpload);
+
+        // Upload the Document
+        console.log("Posting Document........");
+        const url = `${API_DEV}/send-file/${id}`;
+        const formData = new FormData();
+        console.log(fileToUpload);
+        formData.append("file", fileToUpload);
+        formData.append("sender", username);
+
+        console.log("Form Data------------------ : " + formData);
+        console.log("URL ------------------- : " + url);
+
+        const repsonse = await axios.post(url, formData, {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        console.log(repsonse);
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    }
+  };
+
+  /* --------------------------------------------------------*/
 
   useEffect(() => {
     const loadData = async () => {
@@ -64,8 +116,6 @@ const Index = () => {
 
         const responseUser = await axios.get(`${API_DEV}/user/${username}`);
 
-
-
         setKeys({
           publicKey: responseUser.data.e,
           privateKey: responseUser.data.d,
@@ -78,15 +128,10 @@ const Index = () => {
 
         setMessagesList(responseMessages.data.data);
 
-
-        const responseSendKey = await axios.get(
-          `${API_DEV}/user/${friend}`
-        );
+        const responseSendKey = await axios.get(`${API_DEV}/user/${friend}`);
 
         setSendKey(responseSendKey.data.data);
         console.log(sendKey);
-
-
       } catch (error) {
         Alert.alert("Error", error.message, [
           { text: "Back to Home", onPress: () => router.replace("/") },
@@ -99,20 +144,19 @@ const Index = () => {
     loadData();
   }, []);
 
-
   const sendMessage = async () => {
     setLoadingData(true);
     try {
       const formData = {
-        "cipher": messageNew,
-        "createdAt": Date, 
-        "message": messageNew,
-        "sender": username,
-        "type": "text"
-      }
+        cipher: messageNew,
+        createdAt: Date,
+        message: messageNew,
+        sender: username,
+        type: "text",
+      };
 
       console.log(formData);
-      const response = await axios.post(`${API_DEV}/message`, formData)
+      const response = await axios.post(`${API_DEV}/message`, formData);
 
       console.log(response.data);
 
@@ -130,8 +174,7 @@ const Index = () => {
       setLoading(false);
       Alert.alert("Error", error.message);
     }
-
-  }
+  };
 
   return (
     <>
@@ -208,11 +251,10 @@ const Index = () => {
             ))}
 
             <Text className="text-[#BC4B48] mt-1">{sendMessageError}</Text>
-            
           </ScrollView>
           {/* Send Message */}
           <View className="h-16 bg-[#C4E0B4] px-4 flex-row items-center justify-between">
-            <Pressable>
+            <Pressable onPress={uploadDocument}>
               <Image source={require("../../../../assets/add-file.png")} />
             </Pressable>
             <TextInput

@@ -12,7 +12,7 @@ router.post("/:roomId", upload.single("file"), async (req, res) => {
   try {
     const { roomId } = req.params;
     if (!roomId) {
-      res.status(400).send({ message: "Room ID is required", status: 400 });
+      res.status(200).send({ message: "Room ID is required", status: 400 });
       return;
     }
 
@@ -27,11 +27,11 @@ router.post("/:roomId", upload.single("file"), async (req, res) => {
     // check if sender is provided
     const { sender } = req.body;
     if (!sender) {
-      res.status(400).send({ message: "Sender is required", status: 400 });
+      res.status(200).send({ message: "Sender is required", status: 400 });
       return;
     }
     if (!req.file) {
-      res.status(400).send({ message: "No file uploaded", status: 400 });
+      res.status(200).send({ message: "No file uploaded", status: 400 });
       return;
     }
 

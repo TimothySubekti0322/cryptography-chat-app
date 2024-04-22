@@ -39,11 +39,11 @@ const DocPicker = () => {
 
         // Upload the Document
         console.log("Posting Document........");
-        const url = `${API_DEV}/send-file/dummy`;
+        const url = `${API_DEV}/send-file/`;
         const formData = new FormData();
-        console.log(doc);
+        console.log(fileToUpload);
         formData.append("file", doc);
-        formData.append("sender", "Test");
+        formData.append("sender", "jodi");
 
         console.log("Form Data------------------ : " + formData);
         console.log("URL ------------------- : " + url);
