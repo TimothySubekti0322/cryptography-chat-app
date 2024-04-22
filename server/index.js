@@ -25,7 +25,12 @@ socketIO.on("connection", (socket) => {
 
   socket.on("push-message", (message) => {
     console.log(`📩: ${message}`);
-    socket.emit("feedback", "Message received");
+    io.emit("feedback", "Message received");
+  });
+
+  socket.on("messageFromClient", (message) => {
+    console.log("Message from client is Arrived at server", message);
+    io.emit("messageFromServer", message);
   });
 });
 
