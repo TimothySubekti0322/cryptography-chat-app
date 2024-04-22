@@ -21,7 +21,7 @@ import axios from "axios";
 
 import { ActivityIndicator } from "react-native-paper";
 
-const MainRoomComponent = ({ showModal }) => {
+const MainRoomComponent = ({ showModal, visible }) => {
   const credentialCtx = useContext(CredentialContext);
 
   const [username, setUsername] = useState("");
@@ -65,6 +65,35 @@ const MainRoomComponent = ({ showModal }) => {
 
     router.replace("/");
   };
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoadingData(true);
+      try {
+        const username = await AsyncStorage.getItem("username");
+        setUsername(username);
+
+        if (!username) {
+          Alert.alert("Error", "username not found", [
+            { text: "Back to Home", onPress: () => router.replace("/") },
+          ]);
+        }
+
+        const response = await axios.get(
+          `${API_DEV}/rooms-and-messages/${username}`
+        );
+
+        setContactList(response.data.rooms);
+      } catch (error) {
+        Alert.alert("Error", error.message, [
+          { text: "Back to Home", onPress: () => router.replace("/") },
+        ]);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+    loadData();
+  }, [visible]);
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />

@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { Modal, Portal, Text, PaperProvider } from "react-native-paper";
-import { Pressable, TextInput, View } from "react-native";
+import { Pressable, TextInput, View, Alert } from "react-native";
 import { Stack } from "expo-router";
 import MainRoomComponent from "./MainRoomComponent";
+import { ActivityIndicator } from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import API_DEV from "../../static/api";
 
 const containerStyle = {
   backgroundColor: "#FFF9E2",
@@ -23,7 +27,50 @@ const Index = () => {
   const hideModal = () => setVisible(false);
 
   const [newContact, setNewContact] = useState("");
-  const [newContactError, setNewContactError] = useState(false);
+  const [newContactError, setNewContactError] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const username1 = await AsyncStorage.getItem("username");
+      const username2 = newContact;
+
+      const formData = {
+        username1: username1,
+        username2: username2,
+      };
+
+      console.log(formData);
+
+      const response = await axios.post(`${API_DEV}/room`, formData);
+
+      console.log(response.data);
+
+      if (response.data.message == "user not found") {
+        console.log("user not found");
+        setLoading(false);
+        setNewContactError("User not found");
+      } else if (response.data.message == "success") {
+        console.log("success");
+        setLoading(false);
+        hideModal();
+        setNewContactError(null);
+      }
+    } catch (error) {
+      setLoading(false);
+      Alert.alert("Error", error.message, [
+        {
+          text: "Ok",
+          onPress: () => {
+            hideModal();
+          },
+        },
+      ]);
+    }
+  };
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -44,18 +91,28 @@ const Index = () => {
               Insert Username
             </Text>
             <TextInput
-              className="border-[1px] border-[#BCA29A] rounded-full mt-2 py-2 px-4"
+              className={`${
+                newContactError ? "border-[#BC4B48]" : "border-[#BCA29A] "
+              } border-[1px] rounded-full mt-2 py-2 px-4`}
               style={{ fontFamily: "Nunito_500Medium" }}
               value={newContact}
               onChangeText={(text) => setNewContact(text)}
             />
+            {newContactError && (
+              <Text className="text-[#BC4B48] mt-1">{newContactError}</Text>
+            )}
             <View className="items-center justify-center w-full mt-8 ">
               <View className="w-1/2 bg-[#C4E0B4] border-[1px] border-[#95B584] rounded-full overflow-hidden">
                 <Pressable
                   android_ripple={{ color: "#91c574" }}
                   className="items-center justify-center py-3"
+                  onPress={handleSubmit}
                 >
-                  <Text style={{ fontFamily: "Nunito_500Medium" }}>Add</Text>
+                  {loading ? (
+                    <ActivityIndicator animating={true} color="#221a07" />
+                  ) : (
+                    <Text style={{ fontFamily: "Nunito_500Medium" }}>Add</Text>
+                  )}
                 </Pressable>
               </View>
             </View>
@@ -67,7 +124,7 @@ const Index = () => {
             </Pressable>
           </Modal>
         </Portal>
-        <MainRoomComponent showModal={showModal} />
+        <MainRoomComponent showModal={showModal} visible={visible} />
       </PaperProvider>
     </>
   );

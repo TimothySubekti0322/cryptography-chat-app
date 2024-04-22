@@ -1,7 +1,7 @@
 import { Modal, Portal, Text, PaperProvider } from "react-native-paper";
 import { useState, useEffect } from "react";
-import { Pressable, TextInput, View } from "react-native";
-import { Stack } from "expo-router";
+import { Alert, Pressable, TextInput, View } from "react-native";
+import { Stack, router } from "expo-router";
 import axios from "axios";
 
 const containerStyle = {
@@ -23,17 +23,39 @@ const AddContactModal = () => {
   const hideModal = () => setVisible(false);
 
   const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState(null);
+
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    const username1 = await AsyncStorage.getItem("username");
-    const username2 = username;
+    console.log("clicked");
+    router.replace("/mainroom");
+    // try {
+    //   const username1 = await AsyncStorage.getItem("username");
+    //   const username2 = username;
 
-    const formData = {
-      username1: username1,
-      username2: username2,
-    };
+    //   const formData = {
+    //     username1: username1,
+    //     username2: username2,
+    //   };
 
-    const response = await axios.post(`${API_DEV}/room`, formData);
+    //   const response = await axios.post(`${API_DEV}/room`, formData);
+
+    //   if (response.data.message == "user not found") {
+    //     setUsernameError("User not found");
+    //   } else if (response.data.message == "success") {
+    //     setLoading(false);
+    //   }
+    // } catch (error) {
+    //   Alert.alert("Error", error.message, [
+    //     {
+    //       text: "Ok",
+    //       onPress: () => {
+    //         router.replace("/mainroom");
+    //       },
+    //     },
+    //   ]);
+    // }
   };
 
   return (
@@ -56,17 +78,27 @@ const AddContactModal = () => {
               Insert Username
             </Text>
             <TextInput
-              className="border-[1px] border-[#BCA29A] rounded-full mt-2 py-2 px-4"
+              className={`${
+                usernameError ? "border-[#BC4B48]" : "border-[#BCA29A] "
+              } border-[1px] rounded-full mt-2 py-2 px-4`}
               value={username}
               onChange={(text) => setUsername(text)}
             />
+            {usernameError && (
+              <Text className="text-[#BC4B48] mt-1">{usernameError}</Text>
+            )}
             <View className="items-center justify-center w-full mt-8 ">
               <View className="w-1/2 bg-[#C4E0B4] border-[1px] border-[#95B584] rounded-full overflow-hidden">
                 <Pressable
                   android_ripple={{ color: "#91c574" }}
                   className="items-center justify-center py-3"
+                  onPress={handleSubmit}
                 >
-                  <Text style={{ fontFamily: "Nunito_500Medium" }}>Add</Text>
+                  {loading ? (
+                    <ActivityIndicator animating={true} color="#221a07" />
+                  ) : (
+                    <Text style={{ fontFamily: "Nunito_500Medium" }}>Add</Text>
+                  )}
                 </Pressable>
               </View>
             </View>
