@@ -15,6 +15,8 @@ import { CredentialContext } from "../../store/context/credential-context";
 import { checkNumberPositivePrime } from "../../utils/function";
 import axios from "axios";
 import API_DEV from "../../static/api";
+import { generateKey } from "../../utils/generateKey";
+import { encrypt } from "../../utils/encrypt";
 
 const Index = () => {
   const credentialCtx = useContext(CredentialContext);
@@ -24,6 +26,12 @@ const Index = () => {
 
   const [primeNumber1Error, setPrimeNumber1Error] = useState(null);
   const [primeNumber2Error, setPrimeNumber2Error] = useState(null);
+
+  const [keys, setKeys] = useState({
+    publicKey:0n,
+    privateKey: 0n,
+    modulus: 0n
+  });
 
   const checkInput = () => {
     if (!primeNumber1) {
@@ -85,6 +93,21 @@ const Index = () => {
           d: 1,
           n: 15,
         };
+        
+        const generated =  generateKey(primeNumber1, primeNumber2)
+        setKeys({
+          publicKey: generated.publicKey,
+          privateKey: generated.privateKey,
+          modulus: generated.modulus
+        });
+        console.log(keys.publicKey, keys.privateKey, keys.modulus);
+
+      if (keys.modulus !== 0n){
+        // test
+        const message = encrypt.encryptText("Testinggg, testing! :) 123 yay letwgo", keys.publicKey, keys.modulus)
+        console.log("ENCRYPTED MESSAGE", message);
+        console.log("DECRYPTED MESSAGE", encrypt.decryptText(message, keys.privateKey, keys.modulus)); 
+      }
 
         // const response = await axios.post(API_DEV + "/user", formData);
         const response = await axios.post(`${API_DEV}/user`, formData);
@@ -98,6 +121,9 @@ const Index = () => {
       } catch (error) {
         alert(error.message);
       }
+
+      
+      
     }
   };
 
