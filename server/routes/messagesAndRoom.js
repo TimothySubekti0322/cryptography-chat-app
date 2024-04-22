@@ -29,7 +29,6 @@ router.get("/:username", async (req, res) => {
       let lastMessage = {};
       messages.forEach((doc) => {
         lastMessage = doc.data();
-        console.log("lastMessage = ", lastMessage);
       });
 
       if (Object.keys(lastMessage).length === 0) {
@@ -46,7 +45,6 @@ router.get("/:username", async (req, res) => {
         username: interlocutors,
         lastMessage: lastMessage,
       };
-      console.log(data);
       roomsList.push(data);
     }
 
