@@ -12,6 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { CredentialContext } from "../../store/context/credential-context";
 import { checkNumberPositivePrime } from "../../utils/function";
+import { generateKey } from "../../utils/generateKey";
+import { encrypt } from "../../utils/encrypt";
 
 const Index = () => {
   const credentialCtx = useContext(CredentialContext);
@@ -21,6 +23,12 @@ const Index = () => {
 
   const [primeNumber1Error, setPrimeNumber1Error] = useState(null);
   const [primeNumber2Error, setPrimeNumber2Error] = useState(null);
+
+  const [keys, setKeys] = useState({
+    publicKey:0n,
+    privateKey: 0n,
+    modulus: 0n
+  });
 
   const checkInput = () => {
     if (!primeNumber1) {
@@ -73,7 +81,24 @@ const Index = () => {
 
     const isValid = checkInput();
 
-    if (isValid) router.replace("../login");
+
+    if (isValid) {   
+      const generated =  generateKey(primeNumber1, primeNumber2)
+      setKeys({
+        publicKey: generated.publicKey,
+        privateKey: generated.privateKey,
+        modulus: generated.modulus
+      });
+      console.log(keys.publicKey, keys.privateKey, keys.modulus);
+
+      if (keys.modulus !== 0n){
+        const message = encrypt.encryptText("Testinggg, testing! :) 123 yay letwgo", keys.publicKey, keys.modulus)
+        console.log("ENCRYPTED MESSAGE", message);
+        console.log("DECRYPTED MESSAGE", encrypt.decryptText(message, keys.privateKey, keys.modulus)); 
+        router.replace("../login"); 
+      }
+      
+    }
   };
 
   return (

@@ -1,12 +1,13 @@
 import primeNumbers from "./primeNumbers";
 
 const checkNumberPositivePrime = (number) => {
-  if (number < 0n) {
+  bigNumber = BigInt(number);
+  if (bigNumber < 0n) {
     return "Number must be positive";
   }
-  if (number <= 10000n) {
+  if (bigNumber <= 10000n) {
     return "Number must be greater than 10000";
-  } else if (number >= 100000000n) {
+  } else if (bigNumber >= 100000000n) {
     return "Number must be smaller than 100000000";
   }
   
@@ -15,8 +16,8 @@ const checkNumberPositivePrime = (number) => {
   // const sqrtNum = sqrt(num);
 
   // Check from 2 to sqrt of num
-  while (BigInt(primeNumbers[i])**2n <= number) {
-      if (num % BigInt(primeNumbers[i]) === 0n){
+  while (BigInt(primeNumbers[i])**2n <= bigNumber) {
+      if (bigNumber % BigInt(primeNumbers[i]) === 0n){
           return "Number must be prime";}
       i++;
   }

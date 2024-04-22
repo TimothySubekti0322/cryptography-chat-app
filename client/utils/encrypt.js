@@ -1,52 +1,56 @@
-const useKey = () => {
-    encryptText = (message, e, n) =>{
+import {decode as atob, encode as btoa} from 'base-64'
+
+const encrypt = {
+    encryptText: (message, e, n) =>{
         cypher = "";
         let messageAscii = "";
-        const nLength = BigInt(n.toString().length);
+        const nLength = n.toString().length;
+        let asciiBlock = 0n;
+
         for (let i = 0; i < message.length; i++) {
             messageAscii += (message.charAt(i)).charCodeAt().toString().padStart(3, "0");
           }
-        const inAscii = BigInt(inAscii);
-        while (inAscii>0n){
-            const asciiBlock = inAscii%4n;
-            inAscii = inAscii/4n;
-            cypher += exponent(asciiBlock, e, n).toString().padStart(nLength, "0");
+
+        while (messageAscii!==""){
+            asciiBlock = BigInt(messageAscii.substr(0,4).padEnd(4, "0"));
+            messageAscii = messageAscii.slice(4);
+            cypher += encrypt.exponent(asciiBlock, e, n).toString().padStart(nLength, "0");
         }
         return btoa(cypher);
-    }
+    },
 
-    encrypt64 = (message, e, n) =>{
+    encrypt64 :(message, e, n) =>{
         const messageText = (atob(message));
-        return encryptText(message, e, n);
-    }
+        return encryptText(messageText, e, n);
+    },
 
-    decryptText = (cypher, d, n) =>{
-        const cypherText = BigInt(atob(cypher))
+    decryptText: (cypher, d, n) =>{
+        let cypherText = atob(cypher);
         message = "";
         let decrypted = ""
-        let nLength = BigInt(n.toString().length);
+        let nLength = n.toString().length;
+        let messageTemp = 0;
 
         while (cypherText > 0n) {
-            cTemp = cypherText / BigInt(10**nLength)
-            console.log(cTemp);
-            cypherText = cypherText % BigInt(10**nLength)
-            message += exponent(cTemp, d, n).toString().padStart(4, "0");
-            console.log(message);
+            cTemp = BigInt(cypherText.substr(0, nLength));
+            cypherText = cypherText.slice(nLength)
+            message += encrypt.exponent(cTemp, d, n).toString().padStart(4, "0");
         }
-        let fullMessage = BigInt(message)
-        while (fullMessage > 0n) {
-            messageTemp = fullMessage / 1000n;
-            fullMessage = fullMessage % 1000n;
+
+        while (message !== "") {
+            messageTemp = Number(message.substr(0,3));
+            message = message.slice(3);
             decrypted += String.fromCharCode(messageTemp);
           }
         return decrypted;
-    }
+    },
 
-    decrypt = (cypher, d, n) =>{
+    decrypt64: (cypher, d, n) =>{
         return btoa(decryptText(cypher, d, n));
-    }
+    },
 
-    const exponent = (base, exponent, modulus) => {
+    exponent: (base, exponent, modulus) => {
+        if (modulus === 0n || modulus ===1n) return 0n;
 
         let result = 1n;
         base = base % modulus;
@@ -56,13 +60,13 @@ const useKey = () => {
             if (exponent % 2n === 1n) {
                 result = (result * base) % modulus;
             }
-            exponent = exponent >> 1n;
+            exponent = exponent/2n;
             base = (base * base) % modulus;
         }
-    
+
         return result;
     }
 }
 
 
-export default useKey;
+export {encrypt};
