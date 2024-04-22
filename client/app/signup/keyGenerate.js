@@ -6,12 +6,15 @@ import {
   View,
   Image,
   KeyboardAvoidingView,
+  ToastAndroid,
 } from "react-native";
 import { Stack, Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { CredentialContext } from "../../store/context/credential-context";
 import { checkNumberPositivePrime } from "../../utils/function";
+import axios from "axios";
+import API_DEV from "../../static/api";
 
 const Index = () => {
   const credentialCtx = useContext(CredentialContext);
@@ -64,7 +67,7 @@ const Index = () => {
     return true;
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     // Handle login here
     console.log("Username: ", credentialCtx.username);
     console.log("Password: ", credentialCtx.password);
@@ -73,7 +76,29 @@ const Index = () => {
 
     const isValid = checkInput();
 
-    if (isValid) router.replace("../login");
+    if (isValid) {
+      try {
+        const formData = {
+          username: credentialCtx.username,
+          password: credentialCtx.password,
+          e: 9,
+          d: 1,
+          n: 15,
+        };
+
+        // const response = await axios.post(API_DEV + "/user", formData);
+        const response = await axios.post(`${API_DEV}/user`, formData);
+
+        if (response.data.message === "User already exists") {
+          alert("User already exists");
+        } else if (response.data.message === "success") {
+          ToastAndroid.show("Sign up Success ✅", ToastAndroid.SHORT);
+          router.replace("../login");
+        }
+      } catch (error) {
+        alert(error.message);
+      }
+    }
   };
 
   return (
