@@ -1,4 +1,6 @@
+import { shareAsync } from "expo-sharing";
 import { useContext, useEffect, useState } from "react";
+import * as FileSystem from "expo-file-system";
 import {
   Image,
   Pressable,
@@ -7,6 +9,7 @@ import {
   Text,
   View,
   Alert,
+  Button
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -30,6 +33,12 @@ const MainRoomComponent = ({ showModal }) => {
 
   const [contactList, setContactList] = useState([]);
 
+  const [keys, setKeys] = useState({
+    publicKey:0n,
+    privateKey: 0n,
+    modulus: 0n
+  });
+
   useEffect(() => {
     const loadData = async () => {
       setLoadingData(true);
@@ -43,11 +52,21 @@ const MainRoomComponent = ({ showModal }) => {
           ]);
         }
 
-        const response = await axios.get(
+        const responseUser = await axios.get( 
+          `${API_DEV}/user/${username}`
+        );
+
+        setKeys({
+          publicKey: responseUser.data.e,
+          privateKey: responseUser.data.d,
+          modulus: responseUser.data.n
+        });
+
+        const responseRooms = await axios.get(
           `${API_DEV}/rooms-and-messages/${username}`
         );
 
-        setContactList(response.data.rooms);
+        setContactList(responseRooms.data.rooms);
       } catch (error) {
         Alert.alert("Error", error.message, [
           { text: "Back to Home", onPress: () => router.replace("/") },
@@ -58,6 +77,63 @@ const MainRoomComponent = ({ showModal }) => {
     };
     loadData();
   }, []);
+
+  async function downloadPublic () { //masih returns null
+    try{
+      const pubName = username + ".pub";
+      const pubPath = FileSystem.documentDirectory;
+      const file = await FileSystem.writeAsStringAsync((pubPath + pubName), ("(" + keys.publicKey+ ", "+ keys.modulus+ ")"), { encoding: FileSystem.EncodingType.UTF8 });
+      console.log(file);
+
+      saveFile(file.uri, pubName, "text/*");
+    } catch (error) {
+      console.log("Error creating or writing to file:", error);
+    }
+  }
+
+  const downloadPrivate = () => {
+    // samain kalo downloadPublic udah bisa !!
+  }
+
+  async function saveFile(uri, filename, mimetype) { // copas dr utils
+    if (Platform.OS === "android") {
+      const permissions =
+        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+      if (permissions.granted) {
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        try {
+          console.log("permissions.directoryUri = ", permissions.directoryUri);
+          console.log("filename = ", filename);
+          console.log("mimetype = ", mimetype);
+          const fileUri =
+            await FileSystem.StorageAccessFramework.createFileAsync(
+              permissions.directoryUri,
+              filename,
+              mimetype
+            );
+
+          console.log("File created at: " + fileUri);
+
+          await FileSystem.writeAsStringAsync(fileUri, base64, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+        } catch (error) {
+          console.log("Error creating or writing to file:", error);
+        }
+      } else {
+        console.log("Permission denied");
+        console.log(uri);
+        shareAsync(uri);
+      }
+    } else {
+      console.log("Permission denied");
+      console.log(uri);
+      shareAsync(uri);
+    }
+  }
 
   const signOutHandler = () => {
     credentialCtx.setUsername("");
@@ -80,7 +156,14 @@ const MainRoomComponent = ({ showModal }) => {
         <SafeAreaView className="" style={{ flex: 1 }}>
           <View className="flex-row items-center w-full px-6 py-6 bg-[#C4E0B4]">
             <Image source={require("../../assets/header-avatar.png")} />
-            <Text className="ml-4 text-2xl font-bold">{username}</Text>
+            <View className="block">
+              <Text className="ml-4 text-2xl font-bold">{username}</Text>
+              <View className="flex-row">
+                <Button title="Public Key" onPress={downloadPublic} ></Button>
+                <Button title="Private Key" onPress={downloadPrivate} ></Button>
+              </View>
+            </View>
+            
           </View>
 
           {/* Contact List */}

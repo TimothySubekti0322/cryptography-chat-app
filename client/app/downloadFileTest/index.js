@@ -61,6 +61,7 @@ export default function App() {
       shareAsync(uri);
     }
   }
+  
     const upload = () => {
     // 1. initialize request
     const xhr = new XMLHttpRequest();
@@ -99,8 +100,6 @@ export default function App() {
             console.log(uploadProgress);
         };
     }
-
-
 }
 
   return (
