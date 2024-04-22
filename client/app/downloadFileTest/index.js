@@ -16,7 +16,12 @@ export default function App() {
     );
 
     // Log the download result
-    console.log(result.headers["content-type"]);
+    console.log("result.uri ------------------- ", result.uri);
+    console.log("filename -------------------- ", filename);
+    console.log(
+      "result.header ---------------- ",
+      result.headers["content-type"]
+    );
 
     // Save the downloaded file
     saveFile(result.uri, filename, result.headers["content-type"]);
@@ -31,6 +36,7 @@ export default function App() {
         const base64 = await FileSystem.readAsStringAsync(uri, {
           encoding: FileSystem.EncodingType.Base64,
         });
+        console.log("base64-------------------------", base64);
         try {
           console.log("permissions.directoryUri = ", permissions.directoryUri);
           console.log("filename = ", filename);
@@ -61,51 +67,31 @@ export default function App() {
       shareAsync(uri);
     }
   }
-  
-    const upload = () => {
-    // 1. initialize request
-    const xhr = new XMLHttpRequest();
-    // 2. open request
-    xhr.open('POST', upload);
-    // 3. set up callback for request
-    xhr.onload = () => {
-        const response = JSON.parse(xhr.response);
 
-        console.log(response);
-        // ... do something with the successful response
-    };
-    // 4. catch for request error
-    xhr.onerror = e => {
-        console.log(e, 'upload failed');
-    };
-    // 4. catch for request timeout
-    xhr.ontimeout = e => {
-        console.log(e, 'upload timeout');
-    };
-    // 4. create fileInput to upload
-    let fileInput = new FormData();
+  const text = "(223,568)";
 
-    fileInput.append('file', {
-        uri: 'some-file-path', 			// this is the path to your file. see Expo ImagePicker or React Native ImagePicker
-        type: `${type}/${fileEnding}`,  // example: image/jpg
-        name: `upload.${fileEnding}`    // example: upload.jpg
-    });
-    // 6. upload the request
-    xhr.send(fileInput);
-    // 7. track upload progress
-    if (xhr.upload) {
-        // track the upload progress
-        xhr.upload.onprogress = ({ total, loaded }) => {
-            const uploadProgress = (loaded / total);
-            console.log(uploadProgress);
-        };
+  async function createTextFileFromPlainText(text, fileName) {
+    try {
+      // Write the text to a file
+      const fileUri = FileSystem.documentDirectory + fileName;
+      await FileSystem.writeAsStringAsync(fileUri, text);
+
+      console.log("Text file created successfully:", fileUri);
+
+      saveFile(fileUri, fileName + ".txt", "text/plain");
+    } catch (error) {
+      console.error("Error creating text file:", error);
+      throw error;
     }
-}
+  }
 
+  const handleClick = async () => {
+    await createTextFileFromPlainText(text, "plainteks");
+  };
   return (
     <SafeAreaView className="items-center justify-center" style={{ flex: 1 }}>
       <Button title="Download" onPress={download} />
-      <Button title="Upload" onPress={upload} />
+      <Button title="Download Txt file" onPress={handleClick} />
     </SafeAreaView>
   );
 }
