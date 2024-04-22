@@ -15,6 +15,7 @@ import { CredentialContext } from "../../store/context/credential-context";
 import { checkNumberPositivePrime } from "../../utils/function";
 import axios from "axios";
 import API_DEV from "../../static/api";
+import { ActivityIndicator } from "react-native-paper";
 import { generateKey } from "../../utils/generateKey";
 import { encrypt } from "../../utils/encrypt";
 
@@ -27,6 +28,7 @@ const Index = () => {
   const [primeNumber1Error, setPrimeNumber1Error] = useState(null);
   const [primeNumber2Error, setPrimeNumber2Error] = useState(null);
 
+  const [loading, setLoading] = useState(false);
   const [keys, setKeys] = useState({
     publicKey:0n,
     privateKey: 0n,
@@ -86,6 +88,7 @@ const Index = () => {
 
     if (isValid) {
       try {
+        setLoading(true);
         const formData = {
           username: credentialCtx.username,
           password: credentialCtx.password,
@@ -115,10 +118,12 @@ const Index = () => {
         if (response.data.message === "User already exists") {
           alert("User already exists");
         } else if (response.data.message === "success") {
+          setLoading(false);
           ToastAndroid.show("Sign up Success ✅", ToastAndroid.SHORT);
           router.replace("../login");
         }
       } catch (error) {
+        setLoading(false);
         alert(error.message);
       }
 
@@ -177,7 +182,11 @@ const Index = () => {
                 className="items-center py-3 rounded-full"
                 onPress={handleSignUp}
               >
-                <Text>sign up</Text>
+                {loading ? (
+                  <ActivityIndicator animating={true} color="#C4E0B4" />
+                ) : (
+                  <Text>sign up</Text>
+                )}
               </Pressable>
             </View>
           </View>
