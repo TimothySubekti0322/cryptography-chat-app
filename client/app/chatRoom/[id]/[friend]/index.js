@@ -38,15 +38,18 @@ const Index = () => {
   const [messagesList, setMessagesList] = useState([]);
   const [messageNew, setMessageNew] = useState("");
 
-  const [sendKey, setSendKey] = useState();
+  const [sendKey, setSendKey] = useState({
+    e: 0n,
+    n: 0n
+  });
   const [sendMessageError, setSendMessageError] = useState(null);
 
 
-  const [keys, setKeys] = useState({
-    publicKey: 0n,
-    privateKey: 0n,
-    modulus: 0n,
-  });
+  // const [keys, setKeys] = useState({
+  //   publicKey: 0n,
+  //   privateKey: 0n,
+  //   modulus: 0n,
+  // });
 
   useEffect(() => {
     const loadData = async () => {
@@ -62,28 +65,27 @@ const Index = () => {
           ]);
         }
 
-        const responseUser = await axios.get(`${API_DEV}/user/${username}`);
+        // // get user data
+        // const responseUser = await axios.get(`${API_DEV}/user/${username}`);
 
+        // setSendKey({
+        //   publicKey: responseUser.data.e,
+        //   privateKey: responseUser.data.d,
+        //   modulus: responseUser.data.n,
+        // });
 
-
-        setKeys({
-          publicKey: responseUser.data.e,
-          privateKey: responseUser.data.d,
-          modulus: responseUser.data.n,
-        });
-
+        // get messages
         const responseMessages = await axios.get(`${API_DEV}/message/${id}`);
-
         console.log("responseMessage = ", responseMessages.data);
-
         setMessagesList(responseMessages.data.data);
 
-
-        const responseSendKey = await axios.get(
-          `${API_DEV}/user/${friend}`
-        );
-
-        setSendKey(responseSendKey.data.data);
+        // get friend key
+        const responseSendKey = await axios.get(`${API_DEV}/user/${friend}`);
+        console.log("friend:", responseSendKey.data)
+        setSendKey({
+          e: responseSendKey.data.user.e,
+          n: responseSendKey.data.user.n
+        });
         console.log(sendKey);
 
 
@@ -103,31 +105,39 @@ const Index = () => {
   const sendMessage = async () => {
     setLoadingData(true);
     try {
+      var currentdate = new Date(); 
+      var datetime = "Last Sync: " + currentdate.getDate() + "/"
+                  + (currentdate.getMonth()+1)  + "/" 
+                  + currentdate.getFullYear() + " @ "  
+                  + currentdate.getHours() + ":"  
+                  + currentdate.getMinutes() + ":" 
+                  + currentdate.getSeconds();
+
       const formData = {
-        "cipher": messageNew,
-        "createdAt": Date, 
+        "cipher": encrypt.encryptText(messageNew, BigInt(sendKey.e), BigInt(sendKey.n)),
+        // "createdAt": datetime, 
         "message": messageNew,
         "sender": username,
-        "type": "text"
+        // "type": "text"
       }
 
-      console.log(formData);
-      const response = await axios.post(`${API_DEV}/message`, formData)
+      console.log("formData", formData);
+      const response = await axios.post(`${API_DEV}/message/${id}`, formData)
 
-      console.log(response.data);
+      console.log("response data", response.data);
 
       if (response.data.message == "user not found") {
         console.log("user not found");
-        setLoading(false);
-        setNewContactError("User not found");
+        setLoadingData(false);
+        setNewContactError(response.data.message);
       } else if (response.data.message == "success") {
         console.log("success");
-        setLoading(false);
+        setLoadingData(false);
         setSendMessageError(null);
       }
       // {"cipher": "xasaqw", "createdAt": [Object], "message": "hai tim", "sender": "jodi", "type": "text"}], "message": "success", "status": 200}
     } catch (error) {
-      setLoading(false);
+      setLoadingData(false);
       Alert.alert("Error", error.message);
     }
 
@@ -188,7 +198,7 @@ const Index = () => {
                     )}
                   </View>
                 ) : (
-                  <View>
+                  <View key={mess.id}>
                     {mess.type == "file" ? (
                       <LeftFileMessage
                         fileName={mess.fileName}
