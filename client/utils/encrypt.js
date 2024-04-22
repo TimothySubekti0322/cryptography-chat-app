@@ -64,3 +64,5 @@ const useKey = () => {
     }
 }
 
+
+export default useKey;
