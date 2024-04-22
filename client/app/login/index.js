@@ -12,6 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, Stack, router } from "expo-router";
 import { CredentialContext } from "../../store/context/credential-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import API_DEV from "../../static/api";
 
 const Login = () => {
   const credentialCtx = useContext(CredentialContext);
@@ -38,23 +40,41 @@ const Login = () => {
     return true;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Handle login here
     console.log("Username: ", username);
     console.log("Password: ", password);
 
     const isValid = checkCredentials();
     if (isValid) {
-      // Save username and password to Credential Context
-      credentialCtx.setUsername(username);
-      credentialCtx.setPassword(password);
+      try {
+        const formData = {
+          username: username,
+          password: password,
+        };
+        const response = await axios.post(`${API_DEV}/user/auth`, formData);
 
-      console.log("");
-      // Save username and password to AsyncStorage
-      AsyncStorage.setItem("username", username);
-      AsyncStorage.setItem("password", password);
+        if (response.data.message === "User not found") {
+          setUsernameError("User not found");
+        } else if (response.data.message === "Invalid password") {
+          setPasswordError("Invalid password");
+        } else if (response.data.message === "success") {
+          setUsernameError(null);
+          setPasswordError(null);
+          // Save username and password to Credential Context
+          credentialCtx.setUsername(username);
+          credentialCtx.setPassword(password);
 
-      router.replace("../mainRoom");
+          console.log("");
+          // Save username and password to AsyncStorage
+          AsyncStorage.setItem("username", username);
+          AsyncStorage.setItem("password", password);
+
+          router.replace("../mainRoom");
+        }
+      } catch (error) {
+        alert(error.message);
+      }
     }
   };
   return (

@@ -11,8 +11,21 @@ import {
 import { Stack, Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import axios from "axios";
+import API_DEV from "../static/api";
 
 const Index = () => {
+  const welcomeAPI = async () => {
+    try {
+      // const response = await axios.get("http://10.0.2.2:4000/welcome");
+      const response = await axios.get(`${API_DEV}/welcome `);
+      console.log(response);
+      alert(response.data.message);
+    } catch (error) {
+      console.error(error);
+      alert("Error: " + error);
+    }
+  };
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -73,6 +86,20 @@ const Index = () => {
                 }}
               >
                 <Text>Download File Test</Text>
+              </Pressable>
+            </View>
+          </View>
+          <View className="items-center w-full mt-4">
+            <View
+              className="w-1/2 rounded-full border-2 border-[#df5fc3] bg-[#d676c1] overflow-hidden"
+              style={{ elevation: 5 }}
+            >
+              <Pressable
+                android_ripple={{ color: "#df5fc3" }}
+                className="items-center py-3 rounded-full"
+                onPress={welcomeAPI}
+              >
+                <Text>welcome API</Text>
               </Pressable>
             </View>
           </View>
