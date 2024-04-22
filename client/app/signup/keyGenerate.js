@@ -6,12 +6,15 @@ import {
   View,
   Image,
   KeyboardAvoidingView,
+  ToastAndroid,
 } from "react-native";
 import { Stack, Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { CredentialContext } from "../../store/context/credential-context";
 import { checkNumberPositivePrime } from "../../utils/function";
+import axios from "axios";
+import API_DEV from "../../static/api";
 import { generateKey } from "../../utils/generateKey";
 import { encrypt } from "../../utils/encrypt";
 
@@ -72,7 +75,7 @@ const Index = () => {
     return true;
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     // Handle login here
     console.log("Username: ", credentialCtx.username);
     console.log("Password: ", credentialCtx.password);
@@ -81,22 +84,45 @@ const Index = () => {
 
     const isValid = checkInput();
 
-
-    if (isValid) {   
-      const generated =  generateKey(primeNumber1, primeNumber2)
-      setKeys({
-        publicKey: generated.publicKey,
-        privateKey: generated.privateKey,
-        modulus: generated.modulus
-      });
-      console.log(keys.publicKey, keys.privateKey, keys.modulus);
+    if (isValid) {
+      try {
+        const formData = {
+          username: credentialCtx.username,
+          password: credentialCtx.password,
+          e: 9,
+          d: 1,
+          n: 15,
+        };
+        
+        const generated =  generateKey(primeNumber1, primeNumber2)
+        setKeys({
+          publicKey: generated.publicKey,
+          privateKey: generated.privateKey,
+          modulus: generated.modulus
+        });
+        console.log(keys.publicKey, keys.privateKey, keys.modulus);
 
       if (keys.modulus !== 0n){
+        // test
         const message = encrypt.encryptText("Testinggg, testing! :) 123 yay letwgo", keys.publicKey, keys.modulus)
         console.log("ENCRYPTED MESSAGE", message);
         console.log("DECRYPTED MESSAGE", encrypt.decryptText(message, keys.privateKey, keys.modulus)); 
-        router.replace("../login"); 
       }
+
+        // const response = await axios.post(API_DEV + "/user", formData);
+        const response = await axios.post(`${API_DEV}/user`, formData);
+
+        if (response.data.message === "User already exists") {
+          alert("User already exists");
+        } else if (response.data.message === "success") {
+          ToastAndroid.show("Sign up Success ✅", ToastAndroid.SHORT);
+          router.replace("../login");
+        }
+      } catch (error) {
+        alert(error.message);
+      }
+
+      
       
     }
   };

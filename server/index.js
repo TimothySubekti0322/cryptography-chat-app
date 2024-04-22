@@ -18,6 +18,7 @@ const userRoutes = require("./routes/users");
 const roomRoutes = require("./routes/rooms");
 const messageRoutes = require("./routes/messages");
 const sendFileRoutes = require("./routes/sendFile");
+const messageAndRoomRoutes = require("./routes/messagesAndRoom");
 
 socketIO.on("connection", (socket) => {
   console.log(`${socket.id} user is just connected`);
@@ -28,16 +29,20 @@ socketIO.on("connection", (socket) => {
   });
 });
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  next();
+});
+
 app.use("/user", userRoutes);
 app.use("/room", roomRoutes);
 app.use("/message", messageRoutes);
 app.use("/send-file", sendFileRoutes);
-
+app.use("/rooms-and-messages", messageAndRoomRoutes);
 
 app.get("/welcome", (req, res) => {
   res.json({ message: "Welcome to the API" });
 });
-
 
 http.listen(PORT, () => {
   console.log(`Server is listeing on ${PORT}`);
