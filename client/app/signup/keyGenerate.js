@@ -30,9 +30,9 @@ const Index = () => {
 
   const [loading, setLoading] = useState(false);
   const [keys, setKeys] = useState({
-    publicKey:0n,
+    publicKey: 0n,
     privateKey: 0n,
-    modulus: 0n
+    modulus: 0n,
   });
 
   const checkInput = () => {
@@ -89,31 +89,49 @@ const Index = () => {
     if (isValid) {
       try {
         setLoading(true);
-        const formData = {
-          username: credentialCtx.username,
-          password: credentialCtx.password,
-          e: 9,
-          d: 1,
-          n: 15,
-        };
-        
-        const generated =  generateKey(primeNumber1, primeNumber2)
+
+        const generated = generateKey(primeNumber1, primeNumber2);
+
+        console.log("checkpoint 1");
+
         setKeys({
           publicKey: generated.publicKey,
           privateKey: generated.privateKey,
-          modulus: generated.modulus
+          modulus: generated.modulus,
         });
+
         console.log(keys.publicKey, keys.privateKey, keys.modulus);
 
-      if (keys.modulus !== 0n){
-        // test
-        const message = encrypt.encryptText("Testinggg, testing! :) 123 yay letwgo", keys.publicKey, keys.modulus)
-        console.log("ENCRYPTED MESSAGE", message);
-        console.log("DECRYPTED MESSAGE", encrypt.decryptText(message, keys.privateKey, keys.modulus)); 
-      }
+        if (keys.modulus !== 0n) {
+          // test
+          const message = encrypt.encryptText(
+            "Testinggg, testing! :) 123 yay letwgo",
+            keys.publicKey,
+            keys.modulus
+          );
+          console.log("ENCRYPTED MESSAGE", message);
+          console.log(
+            "DECRYPTED MESSAGE",
+            encrypt.decryptText(message, keys.privateKey, keys.modulus)
+          );
+        }
+
+        const formData = {
+          username: credentialCtx.username,
+          password: credentialCtx.password,
+          e: generated.publicKey.toString(),
+          d: generated.privateKey.toString(),
+          n: generated.modulus.toString(),
+        };
+
+        console.log("formData.e ------------------- ", formData.e);
+        console.log("formData.d ------------------- ", formData.d);
+        console.log("formData.n ------------------- ", formData.n);
 
         // const response = await axios.post(API_DEV + "/user", formData);
         const response = await axios.post(`${API_DEV}/user`, formData);
+
+        console.log("checkpoint 2");
 
         if (response.data.message === "User already exists") {
           alert("User already exists");
@@ -126,9 +144,6 @@ const Index = () => {
         setLoading(false);
         alert(error.message);
       }
-
-      
-      
     }
   };
 
