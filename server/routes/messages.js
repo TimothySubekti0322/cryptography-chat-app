@@ -20,7 +20,6 @@ router.get("/:roomId", async (req, res) => {
       .collection("rooms")
       .doc(roomId)
       .collection("messages")
-      .orderBy("createdAt", "asc")
       .get();
 
     const messagesList = [];

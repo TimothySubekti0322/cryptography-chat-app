@@ -8,10 +8,14 @@ const db = firebaseAdmin.firestore();
 const storage = require("../storage");
 const upload = require("../upload");
 
-
 router.post("/:roomId", upload.single("file"), async (req, res) => {
   try {
+    console.log("checkpoint 1");
+
     const { roomId } = req.params;
+
+    console.log("roomId = ", roomId);
+
     if (!roomId) {
       res.status(200).send({ message: "Room ID is required", status: 400 });
       return;
@@ -27,6 +31,9 @@ router.post("/:roomId", upload.single("file"), async (req, res) => {
 
     // check if sender is provided
     const { sender } = req.body;
+
+    console.log("sender = ", sender);
+
     if (!sender) {
       res.status(200).send({ message: "Sender is required", status: 400 });
       return;
@@ -38,11 +45,14 @@ router.post("/:roomId", upload.single("file"), async (req, res) => {
 
     // upload file to cloudinary
     const fileBase64 = req.file.buffer.toString("base64");
+
+    console.log("fileBase64 = ", fileBase64);
+
     const file = `data:${req.file.mimetype};base64,${fileBase64}`;
 
     const uploadResponse = await storage.uploader.upload(file);
 
-    const encryptedFileBase64 = encrypt.encrypt64(fileBase64);
+    const encryptedFileBase64 = fileBase64;
 
     const encryptedFile = `data:${req.file.mimetype};base64,${encryptedFileBase64}`;
 
@@ -80,12 +90,11 @@ router.post("/:roomId", upload.single("file"), async (req, res) => {
       status: 200,
     });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send({ error });
   }
 });
 
-
-const { decode, encode } = require('base-64')
+const { decode, encode } = require("base-64");
 
 const encrypt = {
   encryptText: (message, e, n) => {
@@ -95,27 +104,61 @@ const encrypt = {
     let asciiBlock = 0n;
 
     for (let i = 0; i < message.length; i++) {
-      messageAscii += (message.charAt(i)).charCodeAt().toString().padStart(3, "0");
+      messageAscii += message
+        .charAt(i)
+        .charCodeAt()
+        .toString()
+        .padStart(3, "0");
     }
 
     while (messageAscii !== "") {
       asciiBlock = BigInt(messageAscii.substr(0, 4).padEnd(4, "0"));
       messageAscii = messageAscii.slice(4);
-      cypher += encrypt.exponent(asciiBlock, e, n).toString().padStart(nLength, "0");
+      cypher += encrypt
+        .exponent(asciiBlock, e, n)
+        .toString()
+        .padStart(nLength, "0");
     }
+
     return encode(cypher);
   },
 
   encrypt64: (message, e, n) => {
-    const messageText = (decode(message));
-    return encryptText(messageText, e, n);
+    let copyN = n;
+    const messageText = decode(message);
+    let cypher = "";
+    let messageAscii = "";
+    const nLength = copyN.toString().length;
+    let asciiBlock = 0n;
+
+    for (let i = 0; i < messageText.length; i++) {
+      messageAscii += messageText
+        .charAt(i)
+        .charCodeAt()
+        .toString()
+        .padStart(3, "0");
+    }
+
+    while (messageAscii !== "") {
+      asciiBlock = BigInt(messageAscii.substr(0, 4).padEnd(4, "0"));
+      messageAscii = messageAscii.slice(4);
+      cypher += encrypt
+        .exponent(BigInt(asciiBlock), BigInt(e), BigInt(n))
+        .toString()
+        .padStart(nLength, "0");
+    }
+
+    return encode(cypher);
+
+    // return encrypt.encryptText(messageText, e, n);
   },
 
-  exponent: (base, exponent, modulus) => {
+  exponent: (b, exponent, modulus) => {
     if (modulus === 0n || modulus === 1n) return 0n;
 
     let result = 1n;
-    base = base % modulus;
+
+    let base = b % modulus;
 
     // pangkatkan
     while (exponent > 0n) {
@@ -127,7 +170,7 @@ const encrypt = {
     }
 
     return result;
-  }
-}
+  },
+};
 
 module.exports = router;

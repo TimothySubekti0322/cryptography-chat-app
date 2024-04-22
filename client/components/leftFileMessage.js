@@ -6,7 +6,8 @@ import { View, Text, Pressable, Image } from "react-native";
 import React from "react";
 import { encrypt } from "../utils/encrypt";
 import { App } from "../app/downloadFileTest/index";
-import { saveFile } from "../utils/saveFile";
+import { saveFile, saveFile2 } from "../utils/saveFile";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const leftFileMessage = ({ fileName, cypherFileName, url, urlCipher }) => {
   console.log("fileName = ", fileName);
@@ -51,8 +52,13 @@ const leftFileMessage = ({ fileName, cypherFileName, url, urlCipher }) => {
       result.headers["Content-Type"]
     );
 
+    let e = await AsyncStorage.getItem("e");
+    e = BigInt(e);
+    let n = await AsyncStorage.getItem("n");
+    n = BigInt(n);
+
     // Save the downloaded file
-    await saveFile(result.uri, filename, result.headers["Content-Type"]);
+    await saveFile2(result.uri, filename, result.headers["Content-Type"], e, n);
   }
   return (
     <View className="items-start w-full pl-6 mb-6">
