@@ -40,7 +40,7 @@ const Index = () => {
                   router.push("/login");
                 }}
               >
-                <Text>Log in</Text>
+                <Text>Log In</Text>
               </Pressable>
             </View>
           </View>
@@ -56,7 +56,7 @@ const Index = () => {
                   router.push("/signup");
                 }}
               >
-                <Text>sign up</Text>
+                <Text>Sign Up</Text>
               </Pressable>
             </View>
           </View>
