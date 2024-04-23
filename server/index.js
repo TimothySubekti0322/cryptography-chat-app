@@ -4,7 +4,7 @@ const http = require("http").Server(app);
 const cors = require("cors");
 const socketIO = require("socket.io")(http, {
   cors: {
-    origin: "http://10.0.2.2:3000/",
+    origin: "*",
   },
 });
 
@@ -30,7 +30,9 @@ socketIO.on("connection", (socket) => {
 
   socket.on("messageFromClient", (message) => {
     console.log("Message from client is Arrived at server", message);
-    io.emit("messageFromServer", message);
+    console.log("Message ID Room", message.idRoom);
+    socket.emit("broadcastFromServer", message);
+    // io.emit("messageFromServer", message);
   });
 });
 

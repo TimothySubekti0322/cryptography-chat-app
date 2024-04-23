@@ -44,10 +44,6 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
-    // Handle login here
-    console.log("Username: ", username);
-    console.log("Password: ", password);
-
     const isValid = checkCredentials();
     if (isValid) {
       try {

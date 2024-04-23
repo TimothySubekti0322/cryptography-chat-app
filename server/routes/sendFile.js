@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const firebase = require("firebase-admin");
 
 const firebaseAdmin = require("../fire");
 const db = firebaseAdmin.firestore();
@@ -10,11 +11,8 @@ const upload = require("../upload");
 
 router.post("/:roomId", upload.single("file"), async (req, res) => {
   try {
-    console.log("checkpoint 1");
 
     const { roomId } = req.params;
-
-    console.log("roomId = ", roomId);
 
     if (!roomId) {
       res.status(200).send({ message: "Room ID is required", status: 400 });
@@ -32,8 +30,6 @@ router.post("/:roomId", upload.single("file"), async (req, res) => {
     // check if sender is provided
     const { sender } = req.body;
 
-    console.log("sender = ", sender);
-
     if (!sender) {
       res.status(200).send({ message: "Sender is required", status: 400 });
       return;
@@ -45,8 +41,6 @@ router.post("/:roomId", upload.single("file"), async (req, res) => {
 
     // upload file to cloudinary
     const fileBase64 = req.file.buffer.toString("base64");
-
-    console.log("fileBase64 = ", fileBase64);
 
     const file = `data:${req.file.mimetype};base64,${fileBase64}`;
 
@@ -73,7 +67,7 @@ router.post("/:roomId", upload.single("file"), async (req, res) => {
       url: uploadResponse.url,
       fileNameCipher: encryptedFileName,
       urlCipher: encryptedUploadResponse.url,
-      createdAt: new Date().toISOString(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
     // Save message to firestore

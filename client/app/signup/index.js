@@ -39,17 +39,10 @@ const SignUp = () => {
   };
 
   const handleSignUp = () => {
-    // Handle login here
-    console.log("Username: ", username);
-    console.log("Password: ", password);
 
     const isValid = checkCredentials();
 
     if (isValid) {
-      // Handle login here
-      console.log("Username: ", username);
-      console.log("Password: ", password);
-
       credentialCtx.setUsername(username);
       credentialCtx.setPassword(password);
 

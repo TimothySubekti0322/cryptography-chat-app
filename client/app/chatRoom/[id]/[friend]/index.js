@@ -5,7 +5,7 @@ import API_DEV from "../../../../static/api";
 import * as DocumentPicker from "expo-document-picker";
 
 import { useRoute } from "@react-navigation/native";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { CredentialContext } from "../../../../store/context/credential-context";
 
 import { Text } from "react-native-paper";
@@ -25,10 +25,8 @@ import {
   Button,
 } from "react-native";
 
-import LeftTextMessage from "../../../../components/leftTextMessage";
-import RightTextMessage from "../../../../components/rightTextMessage";
-import LeftFileMessage from "../../../../components/leftFileMessage";
-import RightFileMessage from "../../../../components/rightFileMessage";
+import socket from "../../../../utils/socket";
+import BodyMessage from "./bodyMessage";
 
 const Index = () => {
   const route = useRoute();
@@ -45,11 +43,6 @@ const Index = () => {
   });
   const [sendMessageError, setSendMessageError] = useState(null);
 
-  // const [keys, setKeys] = useState({
-  //   publicKey: 0n,
-  //   privateKey: 0n,
-  //   modulus: 0n,
-  // });
 
   useEffect(() => {
     const loadData = async () => {
@@ -65,34 +58,21 @@ const Index = () => {
           ]);
         }
 
-        // // get user data
-        // const responseUser = await axios.get(`${API_DEV}/user/${username}`);
-
-        // setSendKey({
-        //   publicKey: responseUser.data.e,
-        //   privateKey: responseUser.data.d,
-        //   modulus: responseUser.data.n,
-        // });
-
         // get messages
         const responseMessages = await axios.get(`${API_DEV}/message/${id}`);
-        console.log("responseMessage = ", responseMessages.data);
         setMessagesList(responseMessages.data.data);
 
         // get friend key
         const responseSendKey = await axios.get(`${API_DEV}/user/${friend}`);
-        console.log("friend:", responseSendKey.data);
         setSendKey({
           e: responseSendKey.data.user.e,
           n: responseSendKey.data.user.n,
         });
-        console.log(sendKey);
       } catch (error) {
         Alert.alert("Error", error.message, [
           { text: "Back to Home", onPress: () => router.replace("/") },
         ]);
       } finally {
-        console.log("finally = ", messagesList);
         setLoadingData(false);
       }
     };
@@ -102,35 +82,25 @@ const Index = () => {
   const sendMessage = async () => {
     setLoadingData(true);
     try {
-      var currentdate = new Date();
-      var datetime =
-        "Last Sync: " +
-        currentdate.getDate() +
-        "/" +
-        (currentdate.getMonth() + 1) +
-        "/" +
-        currentdate.getFullYear() +
-        " @ " +
-        currentdate.getHours() +
-        ":" +
-        currentdate.getMinutes() +
-        ":" +
-        currentdate.getSeconds();
-
       const formData = {
         cipher: encrypt.encryptText(
           messageNew,
           BigInt(sendKey.e),
           BigInt(sendKey.n)
         ),
-        // "createdAt": datetime,
         message: messageNew,
         sender: username,
-        // "type": "text"
       };
 
       console.log("formData", formData);
+
       const response = await axios.post(`${API_DEV}/message/${id}`, formData);
+
+      // Emit Message
+      socket.emit("messageFromClient", {
+        idRoom: id,
+        messageData: formData,
+      });
 
       console.log("response data", response.data);
 
@@ -142,17 +112,31 @@ const Index = () => {
         console.log("success");
         setLoadingData(false);
         setSendMessageError(null);
+        setMessageNew("");
       }
-      // {"cipher": "xasaqw", "createdAt": [Object], "message": "hai tim", "sender": "jodi", "type": "text"}], "message": "success", "status": 200}
     } catch (error) {
       setLoadingData(false);
       Alert.alert("Error", error.message);
     }
   };
 
+  // Listen to the message from the server
+  useLayoutEffect(() => {
+    socket.on("broadcastFromServer", (messageData) => {
+      if (messageData.idRoom == id) {
+        console.log("The Message is for me 👍");
+        console.log("messageData = ", messageData.messageData);
+        setMessagesList((prev) => [...prev, messageData.messageData]);
+      }
+    });
+    
+    return () => {
+      socket.off("broadcastFromServer");
+    }
+  }, [socket, messagesList]);
+
   /* ------------------------ Send File -------------------------------- */
   const [doc, setDoc] = useState(null);
-  // const [loading, setLoading] = useState(false);
   const uploadDocument = async () => {
     // Pick the document
     try {
@@ -208,96 +192,44 @@ const Index = () => {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <StatusBar backgroundColor="#FFE6AB" barStyle="dark-content" />
-      {loadingData ? (
-        <SafeAreaView style={{ flex: 1 }}>
-          {/* Header Section */}
-          <View className="flex-row items-center px-8 py-4 bg-[#FFE6AB]">
-            <Pressable onPress={() => router.back()}>
-              <Image source={require("../../../../assets/chevron-left.png")} />
-            </Pressable>
-            <Text
-              className="ml-6 text-2xl"
-              style={{ fontFamily: "Nunito_700Bold" }}
-            >
-              {friend}
-            </Text>
-          </View>
-        </SafeAreaView>
-      ) : (
-        <SafeAreaView style={{ flex: 1 }}>
-          {/* Header Section */}
-          <View className="flex-row items-center px-8 py-4 bg-[#FFE6AB]">
-            <Pressable onPress={() => router.back()}>
-              <Image source={require("../../../../assets/chevron-left.png")} />
-            </Pressable>
-            <Text
-              className="ml-6 text-2xl"
-              style={{ fontFamily: "Nunito_700Bold" }}
-            >
-              {friend}
-            </Text>
-          </View>
 
-          {/* Body */}
-          <ScrollView className="bg-[#FFF9E2] pt-8" style={{ flex: 1 }}>
-            {messagesList.map((mess) => (
-              <View key={mess.id}>
-                {mess.sender.match(username) ? (
-                  <View>
-                    {mess.type == "file" ? (
-                      <RightFileMessage
-                        fileName={mess.fileName}
-                        cypherFileName={mess.fileNameCipher}
-                        url={mess.url}
-                        urlCipher={mess.urlCipher}
-                      />
-                    ) : (
-                      <RightTextMessage
-                        message={mess.message}
-                        cipher={mess.cipher}
-                      />
-                    )}
-                  </View>
-                ) : (
-                  <View key={mess.id}>
-                    {mess.type == "file" ? (
-                      <LeftFileMessage
-                        fileName={mess.fileName}
-                        cypherFileName={mess.fileNameCipher}
-                        url={mess.url}
-                        urlCipher={mess.urlCipher}
-                      />
-                    ) : (
-                      <LeftTextMessage
-                        message={mess.message}
-                        cipher={mess.cipher}
-                      />
-                    )}
-                  </View>
-                )}
-              </View>
-            ))}
+      <SafeAreaView style={{ flex: 1 }}>
+        {/* Header Section */}
+        <View className="flex-row items-center px-8 py-4 bg-[#FFE6AB]">
+          <Pressable onPress={() => router.back()}>
+            <Image source={require("../../../../assets/chevron-left.png")} />
+          </Pressable>
+          <Text
+            className="ml-6 text-2xl"
+            style={{ fontFamily: "Nunito_700Bold" }}
+          >
+            {friend}
+          </Text>
+        </View>
 
-            <Text className="text-[#BC4B48] mt-1">{sendMessageError}</Text>
-          </ScrollView>
-          {/* Send Message */}
-          <View className="h-16 bg-[#C4E0B4] px-4 flex-row items-center justify-between">
-            <Pressable onPress={uploadDocument}>
-              <Image source={require("../../../../assets/add-file.png")} />
-            </Pressable>
-            <TextInput
-              placeholder="type here..."
-              className="border-[1px] rounded-xl mx-4 h-10 px-4"
-              value={messageNew}
-              onChangeText={(text) => setMessageNew(text)}
-              style={{ flex: 1 }}
-            />
-            <Pressable onPress={sendMessage}>
-              <Image source={require("../../../../assets/send-message.png")} />
-            </Pressable>
-          </View>
-        </SafeAreaView>
-      )}
+        {/* Body */}
+        <BodyMessage
+          messagesList={messagesList}
+          sendMessageError={sendMessageError}
+          username={username}
+        />
+        {/* Send Message */}
+        <View className="h-16 bg-[#C4E0B4] px-4 flex-row items-center justify-between">
+          <Pressable onPress={uploadDocument}>
+            <Image source={require("../../../../assets/add-file.png")} />
+          </Pressable>
+          <TextInput
+            placeholder="type here..."
+            className="border-[1px] rounded-xl mx-4 h-10 px-4"
+            value={messageNew}
+            onChangeText={(text) => setMessageNew(text)}
+            style={{ flex: 1 }}
+          />
+          <Pressable onPress={sendMessage}>
+            <Image source={require("../../../../assets/send-message.png")} />
+          </Pressable>
+        </View>
+      </SafeAreaView>
     </>
   );
 };

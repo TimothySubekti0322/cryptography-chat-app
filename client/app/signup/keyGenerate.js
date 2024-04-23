@@ -78,12 +78,6 @@ const Index = () => {
   };
 
   const handleSignUp = async () => {
-    // Handle login here
-    console.log("Username: ", credentialCtx.username);
-    console.log("Password: ", credentialCtx.password);
-    console.log("Prime 1: ", primeNumber1);
-    console.log("Prime 2: ", primeNumber2);
-
     const isValid = checkInput();
 
     if (isValid) {
@@ -92,15 +86,11 @@ const Index = () => {
 
         const generated = generateKey(primeNumber1, primeNumber2);
 
-        console.log("checkpoint 1");
-
         setKeys({
           publicKey: generated.publicKey,
           privateKey: generated.privateKey,
           modulus: generated.modulus,
         });
-
-        console.log(keys.publicKey, keys.privateKey, keys.modulus);
 
         if (keys.modulus !== 0n) {
           // test
@@ -108,11 +98,6 @@ const Index = () => {
             "Testinggg, testing! :) 123 yay letwgo",
             keys.publicKey,
             keys.modulus
-          );
-          console.log("ENCRYPTED MESSAGE", message);
-          console.log(
-            "DECRYPTED MESSAGE",
-            encrypt.decryptText(message, keys.privateKey, keys.modulus)
           );
         }
 
@@ -124,14 +109,7 @@ const Index = () => {
           n: generated.modulus.toString(),
         };
 
-        console.log("formData.e ------------------- ", formData.e);
-        console.log("formData.d ------------------- ", formData.d);
-        console.log("formData.n ------------------- ", formData.n);
-
-        // const response = await axios.post(API_DEV + "/user", formData);
         const response = await axios.post(`${API_DEV}/user`, formData);
-
-        console.log("checkpoint 2");
 
         if (response.data.message === "User already exists") {
           alert("User already exists");

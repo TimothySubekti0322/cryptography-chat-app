@@ -84,7 +84,8 @@ export const saveFile2 = async (uri, filename, mimetype, e, n) => {
 
         const encryptedFile = await encrypt.encrypt64(base64, e, n);
 
-        console.log(encryptedFile)
+        // console.log(encryptedFile)
+        console.log("File encrypted");
 
         await FileSystem.writeAsStringAsync(fileUri, encryptedFile, {
           encoding: FileSystem.EncodingType.Base64,

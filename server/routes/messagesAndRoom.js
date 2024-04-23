@@ -14,8 +14,6 @@ router.get("/:username", async (req, res) => {
       .get();
     const roomsList = [];
 
-    console.log("checkpoint 1");
-
     for (const doc of rooms.docs) {
       // Generate Username
       const interlocutors = doc
@@ -33,15 +31,12 @@ router.get("/:username", async (req, res) => {
         lastMessage = doc.data();
       });
 
-      console.log("lastMessage = ", lastMessage.type);
-
       if (Object.keys(lastMessage).length == 0) {
         lastMessage = "click here to say hi.";
       } else {
         if (lastMessage.type === "file") {
           lastMessage = interlocutors + " sent a file";
         } else if (lastMessage.type === "text") {
-          console.log("checkpoint 2");
           lastMessage = limitText(lastMessage.message, 26);
         }
       }

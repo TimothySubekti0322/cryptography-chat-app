@@ -48,7 +48,7 @@ const MainRoomComponent = ({ showModal, visible }) => {
       const privateKey = `(${d},${n})`;
       console.log("privateKey", privateKey);
       await createTextFileFromPlainText(privateKey, "*.pri");
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const downloadPublicKey = async () => {
@@ -58,7 +58,7 @@ const MainRoomComponent = ({ showModal, visible }) => {
       const publicKey = `(${e},${n})`;
       console.log("publicKey", publicKey);
       await createTextFileFromPlainText(publicKey, "*.pub");
-    } catch (error) { }
+    } catch (error) {}
   };
 
   useEffect(() => {

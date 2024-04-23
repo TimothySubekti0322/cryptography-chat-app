@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const firebase = require("firebase-admin");
 
 const firebaseAdmin = require("../fire");
 const db = firebaseAdmin.firestore();
@@ -20,14 +21,15 @@ router.get("/:roomId", async (req, res) => {
       .collection("rooms")
       .doc(roomId)
       .collection("messages")
+      .orderBy("createdAt", "asc")
       .get();
 
     const messagesList = [];
     messages.forEach((doc) => {
-      messagesList.push(doc.data());
+      messagesList.push({ id: doc.id, ...doc.data() });
     });
 
-    messagesList.splice(messagesList.length - 1);
+    // messagesList.splice(messagesList.length - 1);
 
     // messagesList.reverse();
 
@@ -61,7 +63,7 @@ router.post("/:roomId", async (req, res) => {
         type: "text",
         message: message,
         cipher: cipher,
-        createdAt: new Date().toISOString(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
 
     res.status(200).send({ message: "Success", status: 200 });
