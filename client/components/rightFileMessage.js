@@ -10,10 +10,10 @@ import { saveFile, saveFile2 } from "../utils/saveFile";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const RightFileMessage = ({ fileName, cypherFileName, url, urlCipher }) => {
-  console.log("fileName = ", fileName);
-  console.log("cypherFileName = ", cypherFileName);
-  console.log("url = ", url);
-  console.log("urlCipher = ", urlCipher);
+  // console.log("fileName = ", fileName);
+  // console.log("cypherFileName = ", cypherFileName);
+  // console.log("url = ", url);
+  // console.log("urlCipher = ", urlCipher);
   async function downloadFile() {
     const filename = fileName;
 
